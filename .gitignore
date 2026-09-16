@@ -10,3 +10,6 @@ __pycache__/
 # Local system files
 Thumbs.db
 .DS_Store
+
+# Root open file during migration
+/VL_IRENE WISDOM.xlsx

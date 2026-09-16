@@ -1,57 +1,58 @@
-# Project Progress & Hand-off Status
+# Master Project Progress & Task Tracker
 
-**Project**: Maritime Spare Parts Data Extraction (PMS Standards)  
-**Last Updated**: 2026-09-15  
-**Workspace**: `joyful-turing`
-
----
-
-## 1. Summary of Completed Work
-
-### Framework & Automation
-- **`GEMINI.md`**: Codified complete maritime PMS rules, character limits (Subsystem ≤ 60 chars, Item Code ≤ 25 chars, Short Desc ≤ 60 chars), 100% UPPERCASE rules, forbidden character replacements, punctuation spacing rules, and 4-sheet template standards. Antigravity automatically loads this on any machine.
-- **`TEMPLATE_PMS_SPARES.xlsx`**: Master template with all 4 required sheets (`SPARES`, `Rules`, `Sheet2`, `Sheet3`) and validation formulas in columns `V` through `AA` populated down to row 500.
-- **`verify_pms_spares.py`**: Automated rule validator script to test generated workbooks against PMS standards before release.
-- **`EXPORT_INSTRUCTIONS.md`**: Guide explaining how to run the extraction task on other machines or standalone environments.
-- **Cross-Machine Sync Strategy**: Transitioned from local chat dependence to Git-driven workspace continuity.
-
-### Completed & Verified Extractions
-All following files have been extracted and verified with 0 PMS errors:
-1. `SATHISH_FLOAT FREE EPIRB.pdf.xlsx`
-2. `SATHISH_COMMON BATTERY TELEPHONE.pdf.xlsx`
-3. `SATHISH_BATTERY CHARGING BOARD FOR GENERAL USE.pdf.xlsx`
+**Project**: Maritime Data Extraction & Processing  
+**Last Updated**: 2026-09-16  
+**Workspace**: `joyful-turing`  
+**GitHub Repository**: `https://github.com/sathishkumar-890/GOOGLE_ANTIGRAVITY.git`
 
 ---
 
-## 2. Pending Tasks (What Needs to Be Done Next)
-
-1. **Extract `F-34 ACCOMMODATION LADDER.pdf`**:
-   - Source PDF: `F-34 ACCOMMODATION LADDER.pdf` (located in workspace root).
-   - Target Output: `SATHISH_F-34 ACCOMMODATION LADDER.pdf.xlsx`.
-   - Extraction checklist:
-     - Include master complete item (`ACCOMMODATION LADDER`, `1 SET`, Pos `None`).
-     - Include major sub-assemblies (e.g., upper/lower platforms, ladder bodies, davit/winch units if applicable).
-     - Extract all individual components from parts lists and section drawings.
-     - Strictly enforce PMS text formatting (100% UPPERCASE, no parentheses in item descriptions, single space after commas, no spaces around hyphens/slashes, space around `X`).
-     - Preserve columns `V` to `AA` validation formulas intact.
-2. **Validate New Extraction**:
-   - Run verification command:
-     ```bash
-     python verify_pms_spares.py "SATHISH_F-34 ACCOMMODATION LADDER.pdf.xlsx"
-     ```
-   - Resolve any reported character limit, casing, or formula discrepancies until 0 errors are reported.
-3. **Repository Sync**:
-   - Commit and push completed workbooks and updated `PROGRESS.md` to Git repository.
+## 1. Task 1: VL_EXTRACTION (Vessel Particulars)
+- **Directory**: `01_VL_EXTRACTION/`
+- **Rules**: `01_VL_EXTRACTION/VL_RULES.md`
+- **Master Workbook**: `VL_IRENE WISDOM.xlsx`
+- **Source Document**: `B-23_DATA BOOKLETS (MACHINERY PARTICULAR LIST).pdf`
+- **Current Status**:
+  - Machinery particulars updated up to **Page 57**.
+  - Automated update scripts (`update_pages_46_49.py`) and backup versions preserved.
+- **Next Steps**:
+  - Extract machinery specifications for **Page 58 onwards** from the data booklet.
+  - Update matching rows in `VL_IRENE WISDOM.xlsx`.
 
 ---
 
-## 3. Hand-off Instructions for Next Session (Machine A or B)
+## 2. Task 2: PHOTO_EDITING (Diagrams & Screen Crops)
+- **Directory**: `02_PHOTO_EDITING/`
+- **Rules**: `02_PHOTO_EDITING/PHOTO_RULES.md`
+- **Subdirectories**: `raw_pages/` (full booklet pages 15–57), `cropped/` (targeted detail crops).
+- **Current Status**:
+  - All rendered booklet pages (pages 15 to 57) organized into `raw_pages/`.
+  - Focused diagram crops (`engine_crop.png`, `crop_p57_weight.png`, `p15_crop.png`) organized into `cropped/`.
+- **Next Steps**:
+  - Render and crop any upcoming booklet pages as needed for verification or table extraction.
 
-When starting a new session on either machine:
-1. Pull the latest commits:
-   ```bash
-   git pull
-   ```
-2. Open the project in Antigravity.
-3. Send this kickoff prompt to the agent:
-   > *"Read `PROGRESS.md` and `GEMINI.md`. Please proceed with extracting spare parts from `F-34 ACCOMMODATION LADDER.pdf` into `SATHISH_F-34 ACCOMMODATION LADDER.pdf.xlsx` following all PMS rules, then run `verify_pms_spares.py` to confirm 0 errors."*
+---
+
+## 3. Task 3: SPARE_EXTRACTION (PMS Maritime Spares)
+- **Directory**: `03_SPARE_EXTRACTION/`
+- **Rules**: `03_SPARE_EXTRACTION/PMS_RULES.md`
+- **Template**: `TEMPLATE_PMS_SPARES.xlsx`
+- **Validator**: `verify_pms_spares.py`
+- **Current Status**:
+  - 3 workbooks fully extracted and verified with 0 PMS errors:
+    1. `SATHISH_FLOAT FREE EPIRB.pdf.xlsx`
+    2. `SATHISH_COMMON BATTERY TELEPHONE.pdf.xlsx`
+    3. `SATHISH_BATTERY CHARGING BOARD FOR GENERAL USE.pdf.xlsx`
+- **Next Steps**:
+  - Extract `F-34 ACCOMMODATION LADDER.pdf` into `SATHISH_F-34 ACCOMMODATION LADDER.pdf.xlsx`.
+  - Run `python verify_pms_spares.py "SATHISH_F-34 ACCOMMODATION LADDER.pdf.xlsx"` to verify 0 errors.
+
+---
+
+## How to Resume Work on Any Machine
+
+1. Run `git pull` to fetch the latest state.
+2. Open Antigravity and select the conversation for your specific task:
+   - **For VL Extraction**: *"Work on Task 1: VL_EXTRACTION. Check `01_VL_EXTRACTION/VL_RULES.md` and continue extraction from page 58."*
+   - **For Photo Editing**: *"Work on Task 2: PHOTO_EDITING. Check `02_PHOTO_EDITING/`."*
+   - **For Spare Parts**: *"Work on Task 3: SPARE_EXTRACTION. Follow `03_SPARE_EXTRACTION/PMS_RULES.md` to extract `F-34 ACCOMMODATION LADDER.pdf`."*
