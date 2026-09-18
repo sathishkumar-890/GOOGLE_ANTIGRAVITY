@@ -360,22 +360,29 @@ function filterCategory(cat, el) {
 
 function switchChannel(channel) {
   if (!channel) return;
-  if (isRecording) {
-    showToast('⚠️ Stop recording before changing channels!');
-    return;
-  }
   activeChannel = channel;
   document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
   const activeEl = document.getElementById(`card-${channel.id}`);
   if (activeEl) activeEl.classList.add('active');
 
   const nameEl = document.getElementById('currentChannelName');
-  const urlEl = document.getElementById('currentChannelUrl');
   const logoEl = document.getElementById('channelLogo');
+  const badgeEl = document.getElementById('currentChannelBadge');
 
   if (nameEl) nameEl.innerText = channel.name;
-  if (urlEl) urlEl.innerText = channel.url;
   if (logoEl) logoEl.innerText = channel.icon || '📺';
+
+  dismissHttpHelper();
+
+  if (badgeEl) {
+    if (channel.url && channel.url.startsWith('http://') && window.location.protocol === 'https:') {
+      badgeEl.className = 'channel-badge-pill warning';
+      badgeEl.innerText = 'HTTP STREAM';
+    } else {
+      badgeEl.className = 'channel-badge-pill live';
+      badgeEl.innerText = 'LIVE • HD';
+    }
+  }
 
   hideStandbyOverlay();
   playStream(channel.url);
@@ -421,12 +428,19 @@ function playStream(url) {
       if (data.fatal) {
         switch(data.type) {
           case Hls.ErrorTypes.NETWORK_ERROR:
-            hls.startLoad();
+            if (activeChannel && activeChannel.url && activeChannel.url.startsWith('http://') && window.location.protocol === 'https:') {
+              showHttpHelper(activeChannel);
+            } else {
+              hls.startLoad();
+            }
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             hls.recoverMediaError();
             break;
           default:
+            if (activeChannel && activeChannel.url && activeChannel.url.startsWith('http://') && window.location.protocol === 'https:') {
+              showHttpHelper(activeChannel);
+            }
             hls.destroy();
             break;
         }
@@ -434,6 +448,11 @@ function playStream(url) {
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = url;
+    video.onerror = () => {
+      if (activeChannel && activeChannel.url && activeChannel.url.startsWith('http://') && window.location.protocol === 'https:') {
+        showHttpHelper(activeChannel);
+      }
+    };
     video.play();
     updatePlayIcon(true);
   }
@@ -615,130 +634,25 @@ function handleUserActivity() {
   }, 3500);
 }
 
-// --- 4. STREAM RECORDER ---
+// --- 4. HTTP STREAM HELPER & UTILITIES ---
 
-let mediaRecorder = null;
-let recordedChunks = [];
-let isRecording = false;
-let recordStartTime = null;
-let recordInterval = null;
-
-function getSupportedMimeType() {
-  const types = [
-    'video/mp4;codecs=avc1,mp4a.40.2',
-    'video/mp4',
-    'video/webm;codecs=vp9,opus',
-    'video/webm;codecs=vp8,opus',
-    'video/webm'
-  ];
-  for (const t of types) {
-    if (MediaRecorder.isTypeSupported(t)) return t;
-  }
-  return '';
+function showHttpHelper(channel) {
+  const overlay = document.getElementById('httpHelperOverlay');
+  if (overlay) overlay.classList.remove('hidden');
 }
 
-function toggleRecording() {
-  if (!isRecording) startRecording();
-  else stopRecording();
+function dismissHttpHelper() {
+  const overlay = document.getElementById('httpHelperOverlay');
+  if (overlay) overlay.classList.add('hidden');
 }
 
-function startRecording() {
-  const video = document.getElementById('players');
-  const stream = video.captureStream ? video.captureStream() : (video.mozCaptureStream ? video.mozCaptureStream() : null);
-
-  if (!stream) {
-    showToast('❌ Browser does not support stream capture.');
+function openStreamExternally() {
+  if (!activeChannel || !activeChannel.url) {
+    showToast('⚠️ No channel selected.');
     return;
   }
-
-  const mimeType = getSupportedMimeType();
-  recordedChunks = [];
-
-  try {
-    mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
-  } catch (err) {
-    showToast('❌ MediaRecorder error: ' + err.message);
-    return;
-  }
-
-  mediaRecorder.ondataavailable = (e) => {
-    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
-  };
-
-  mediaRecorder.onstop = saveRecordedFile;
-  mediaRecorder.start(1000);
-  isRecording = true;
-  recordStartTime = Date.now();
-
-  const btn = document.getElementById('btnRecord');
-  btn.classList.add('recording');
-  document.getElementById('recBtnLabel').innerText = 'Stop & Save Video';
-  document.getElementById('recOverlay').style.display = 'flex';
-
-  recordInterval = setInterval(updateRecTimer, 500);
-  showToast('⏺️ Recording started...');
-}
-
-function updateRecTimer() {
-  const diff = Math.floor((Date.now() - recordStartTime) / 1000);
-  const mins = String(Math.floor(diff / 60)).padStart(2, '0');
-  const secs = String(diff % 60).padStart(2, '0');
-  document.getElementById('recTimer').innerText = `${mins}:${secs}`;
-}
-
-function stopRecording() {
-  if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
-  mediaRecorder.stop();
-  isRecording = false;
-  clearInterval(recordInterval);
-
-  const btn = document.getElementById('btnRecord');
-  btn.classList.remove('recording');
-  document.getElementById('recBtnLabel').innerText = 'Record Stream (MP4)';
-  document.getElementById('recOverlay').style.display = 'none';
-  document.getElementById('recTimer').innerText = '00:00';
-}
-
-function saveRecordedFile() {
-  const mimeType = mediaRecorder.mimeType || 'video/mp4';
-  const isMp4 = mimeType.includes('mp4');
-  const ext = isMp4 ? 'mp4' : 'webm';
-  const blob = new Blob(recordedChunks, { type: mimeType });
-
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  const timeStr = new Date().toISOString().replace(/[:.]/g, '-');
-  a.href = url;
-  a.download = `${(activeChannel.name || 'Stream').replace(/\s+/g, '_')}_Record_${timeStr}.${ext}`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(() => URL.revokeObjectURL(url), 2000);
-
-  showToast(`✅ Saved ${a.download} (${(blob.size / (1024 * 1024)).toFixed(2)} MB) to your PC!`);
-}
-
-function takeSnapshot() {
-  const video = document.getElementById('players');
-  if (!video.videoWidth || !video.videoHeight) {
-    showToast('⚠️ No active video frame to capture.');
-    return;
-  }
-  const canvas = document.createElement('canvas');
-  canvas.width = video.videoWidth;
-  canvas.height = video.videoHeight;
-  const ctx = canvas.getContext('2d');
-  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-  const a = document.createElement('a');
-  const timeStr = new Date().toISOString().replace(/[:.]/g, '-');
-  a.href = canvas.toDataURL('image/png');
-  a.download = `${(activeChannel.name || 'Stream').replace(/\s+/g, '_')}_Snapshot_${timeStr}.png`;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-
-  showToast(`📸 Snapshot saved: ${a.download}`);
+  window.open(activeChannel.url, '_blank');
+  showToast('🚀 Launching stream in external player / browser tab...');
 }
 
 function showToast(msg) {
@@ -819,12 +733,6 @@ window.addEventListener('DOMContentLoaded', () => {
     } else if (e.code === 'KeyM') {
       e.preventDefault();
       toggleMute();
-    } else if (e.code === 'KeyR') {
-      e.preventDefault();
-      toggleRecording();
-    } else if (e.code === 'KeyS') {
-      e.preventDefault();
-      takeSnapshot();
     }
   });
 });

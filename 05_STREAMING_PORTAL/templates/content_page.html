@@ -43,13 +43,6 @@
     <div class="player-section">
       <div class="video-viewport" id="videoViewport">
         
-        <!-- Live Recording Indicator -->
-        <div id="recOverlay" class="rec-overlay">
-          <div class="rec-dot"></div>
-          <span>REC</span>
-          <span id="recTimer" style="font-family: monospace;">00:00</span>
-        </div>
-
         <!-- Video Element -->
         <video id="players" playsinline></video>
 
@@ -74,6 +67,39 @@
             <div class="banner-prompt-pill">
               <span class="banner-prompt-icon">👉</span>
               <span>Select any channel from the playlist on the right</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Insecure HTTP Stream Helper Overlay -->
+        <div class="http-helper-overlay hidden" id="httpHelperOverlay">
+          <div class="http-helper-card">
+            <div class="http-warning-icon">
+              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                <line x1="12" y1="9" x2="12" y2="13"></line>
+                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              </svg>
+            </div>
+            <h3 class="http-helper-title">Insecure HTTP Stream Detected</h3>
+            <p class="http-helper-desc">This channel broadcasts over HTTP. Modern web browsers protect HTTPS sites by restricting unencrypted media streams by default.</p>
+            
+            <div class="http-guide-box">
+              <div class="http-guide-title">💡 Enable In-Browser Playback in 5 Seconds:</div>
+              <ol class="http-guide-steps">
+                <li>Click the <b>Tune / Lock icon (🔒 or 🎛️)</b> in your address bar above.</li>
+                <li>Select <b>Site settings</b>.</li>
+                <li>Set <b>Insecure content</b> from <i>Block</i> to <b>Allow</b>.</li>
+                <li>Reload this page and enjoy direct playback!</li>
+              </ol>
+            </div>
+
+            <div class="http-actions-row">
+              <button class="btn-external-play" id="btnExternalPlay" onclick="openStreamExternally()">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span>Open in External Player / VLC</span>
+              </button>
+              <button class="btn-dismiss-helper" onclick="dismissHttpHelper()">Dismiss</button>
             </div>
           </div>
         </div>
@@ -151,22 +177,16 @@
 
       </div>
 
-      <!-- Stream Meta & Studio Control Bar -->
+      <!-- Stream Meta Header -->
       <div class="stream-header">
         <div class="current-channel-info">
           <div id="channelLogo" class="channel-logo-display">📺</div>
           <div class="channel-meta">
-            <h3 id="currentChannelName">No Stream Selected</h3>
-            <p id="currentChannelUrl">Choose a stream or click any channel from the playlist to play video</p>
+            <div class="channel-title-row">
+              <h3 id="currentChannelName">No Stream Selected</h3>
+              <span class="channel-badge-pill" id="currentChannelBadge">Ready to Stream</span>
+            </div>
           </div>
-        </div>
-
-        <div class="studio-actions">
-          <button id="btnRecord" class="btn btn-record" onclick="toggleRecording()">
-            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
-            <span id="recBtnLabel">Record Stream (MP4)</span>
-          </button>
-          <button class="btn btn-secondary" onclick="takeSnapshot()" title="Capture High-Res Photo">📸 Snapshot</button>
         </div>
       </div>
     </div>
