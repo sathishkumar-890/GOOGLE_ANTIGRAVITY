@@ -1,6 +1,9 @@
-// Nexus Modern IPTV Player & YouTube-Style Controller Engine
+// Nexus Modern IPTV Player & YouTube-Style Controller Engine with Dynamic Google Sheet Sync
 
-const channelData = [
+// 1. Initial Channel Data (Server-injected or Default Fallback)
+let channelData = (window.INITIAL_CHANNELS && window.INITIAL_CHANNELS.length > 0) 
+  ? window.INITIAL_CHANNELS 
+  : [
   {
     "id": "aaryaa_tv",
     "name": "Aaryaa Tv",
@@ -22,226 +25,6 @@ const channelData = [
     "resolution": "640x360"
   },
   {
-    "id": "hungama_tv",
-    "name": "Hungama TV",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "http://103.185.24.134:3001/HUNGAMA/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1047x576"
-  },
-  {
-    "id": "isaiaruvi_tv",
-    "name": "Isaiaruvi Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://segment.yuppcdn.net/140622/isaiaruvi/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "704x396"
-  },
-  {
-    "id": "kalaignar_murasu",
-    "name": "Kalaignar Murasu",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/murasu_nim_https/050522/murasu/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "704x396"
-  },
-  {
-    "id": "kalaignar_tv",
-    "name": "Kalaignar Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "704x396"
-  },
-  {
-    "id": "mk_six",
-    "name": "MK Six",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt06.tangotv.in/qYyB8fXVMKSIX/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "mn_tv",
-    "name": "MN Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mntv.livebox.co.in/mntvhls/live.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1280x720"
-  },
-  {
-    "id": "madha_tv",
-    "name": "Madha TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://mumt07.tangotv.in/zHjX9OFlMADHATV/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "madhimugam_tv",
-    "name": "Madhimugam TV",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://mumt01.tangotv.in/O5aw8Zn3MATHIMUGAMTV/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "mei_alai_tv",
-    "name": "Mei Alai TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://meialai.iptelevishion.com/meialai/2/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "768x576"
-  },
-  {
-    "id": "movie_club_2_tv",
-    "name": "Movie Club 2 Tv",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://d3gnyty2vddhsg.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/pb-ytipwjqub3kf8/TMC2_IN.m3u8?ads.ads_cdn=cf&ads.cdn=cf",
-    "status": "Live",
-    "live": true,
-    "resolution": "640x360"
-  },
-  {
-    "id": "movie_club_tv",
-    "name": "Movie Club Tv",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://sis-global.prod.samsungtv.plus/v1/tvpprd/sc-mp2ar4ca425xo.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "640x360"
-  },
-  {
-    "id": "murasu_tv",
-    "name": "Murasu Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://segment.yuppcdn.net/050522/murasu/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "704x396"
-  },
-  {
-    "id": "nh_tamil_gold",
-    "name": "NH Tamil Gold",
-    "cat": "Tamil",
-    "icon": "🎬",
-    "url": "https://d3arbp6l7f096k.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/pb-gv6wgpbb4mgwk/playlist.m3u8?ads.ads_cdn=cf&ads.app_domain=APP_DOMAIN&ads.cdn=cf",
-    "status": "Live",
-    "live": true,
-    "resolution": "640x360"
-  },
-  {
-    "id": "news_7_tv",
-    "name": "News 7 Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://segment.yuppcdn.net/240122/news7/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "704x396"
-  },
-  {
-    "id": "news_tamil_24x7",
-    "name": "News Tamil 24x7",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://cdn.pishow.tv/ott/live/1433/master.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1047x576"
-  },
-  {
-    "id": "nickelodeon",
-    "name": "Nickelodeon",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "http://103.185.24.134:3001/NICK/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1047x576"
-  },
-  {
-    "id": "polimer_tv",
-    "name": "Polimer TV",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://cdn.pishow.tv/ott/live/1241/master.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1047x576"
-  },
-  {
-    "id": "puthiya_thalaimurai",
-    "name": "Puthiya Thalaimurai",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://mumt07.tangotv.in/zHjX9OFlPUTHIYAEXPRESS/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "puthuyugam_tv",
-    "name": "Puthuyugam TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt04.tangotv.in/m18aqlK4PUTHUYUGAMTV/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "sirippoli_tv",
-    "name": "Sirippoli Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://segment.yuppcdn.net/240122/siripoli/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "704x396"
-  },
-  {
-    "id": "sonic",
-    "name": "Sonic",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "http://103.185.24.134:3001/SONIC/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1047x576"
-  },
-  {
-    "id": "sony_bbc_earth_hd",
-    "name": "Sony BBC Earth HD",
-    "cat": "Tamil",
-    "icon": "✨",
-    "url": "https://cloudplay-sonyliv.pages.dev/bbcearthhd.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "384x216"
-  },
-  {
     "id": "sony_pix_hd",
     "name": "Sony Pix HD",
     "cat": "English",
@@ -252,787 +35,304 @@ const channelData = [
     "resolution": "384x216"
   },
   {
-    "id": "sony_sports_ten_4",
-    "name": "Sony Sports Ten 4",
+    "id": "kalaignar_tv",
+    "name": "Kalaignar Tv",
     "cat": "Tamil",
-    "icon": "🏏",
-    "url": "https://cloudplay-sonyliv.pages.dev/ten4.m3u8",
+    "icon": "📺",
+    "url": "https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8",
     "status": "Live",
     "live": true,
-    "resolution": "384x216"
-  },
-  {
-    "id": "sony_yay",
-    "name": "Sony Yay!",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "https://cloudplay-sonyliv.pages.dev/yay.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "384x216"
-  },
-  {
-    "id": "south_station_tv",
-    "name": "South Station Tv",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://cc-yw7ztecy8do3q.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-yw7ztecy8do3q/SS_IN.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "640x360"
-  },
-  {
-    "id": "star_vijay",
-    "name": "Star Vijay",
-    "cat": "Tamil",
-    "icon": "⭐",
-    "url": "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:starvijayuk.smil/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "640x360"
-  },
-  {
-    "id": "super_hungama",
-    "name": "Super Hungama",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "http://103.185.24.134:3001/SUPER-HUNGAMA/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1047x576"
-  },
-  {
-    "id": "tamil_janam",
-    "name": "Tamil Janam",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://mumt01.tangotv.in/O5aw8Zn3JANAMTVTAMIL/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "tamilan_tv",
-    "name": "Tamilan TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt04.tangotv.in/m18aqlK4TAMILANTELEVISION/index.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "489x360"
-  },
-  {
-    "id": "wow_kidz_tamil",
-    "name": "WOW Kidz Tamil",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "https://yuppparoriglin.akamaized.net/181224/smil:wowkidztam.smil/playlist.m3u8?hdnts=st=1735898689~exp=1835898688~acl=*~hmac=f5fe24724fe05481e3841f9eb5ab8efdee0a3dd83645ae9dcf45703f525bab7b",
-    "status": "Live",
-    "live": true,
-    "resolution": "1280x720"
-  },
-  {
-    "id": "yet_max",
-    "name": "YET Max",
-    "cat": "Tamil",
-    "icon": "🎵",
-    "url": "https://live.yettelevision.com:5443/LiveApp/streams/yettv2.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1280x720"
-  },
-  {
-    "id": "yet_tv",
-    "name": "YET TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://live.yettelevision.com:5443/LiveApp/streams/yettv.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "1280x720"
-  },
-  {
-    "id": "zee_tamil_hd",
-    "name": "Zee Tamil HD",
-    "cat": "Tamil",
-    "icon": "✨",
-    "url": "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:zeetamil1.smil/playlist.m3u8",
-    "status": "Live",
-    "live": true,
-    "resolution": "640x360"
-  },
-  {
-    "id": "7s_music_tv",
-    "name": "7s Music Tv",
-    "cat": "Tamil",
-    "icon": "🎵",
-    "url": "https://cdn.pishow.tv/ott/live/1257/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "aaseervatham_tv",
-    "name": "Aaseervatham TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://mumt04.tangotv.in/m18aqlK4AASEERVATHAMTV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "aastha_tamil",
-    "name": "Aastha Tamil",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://aasthaott.akamaized.net/110923/smil:aasthatamil.smil/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "angel_tv",
-    "name": "Angel TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://janya-digimix.akamaized.net/vglive-sk-394914/india/ngrp:angelindia_all/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "angel_tv_america",
-    "name": "Angel TV America",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://janya-digimix.akamaized.net/vglive-sk-374850/america/ngrp:angelamerica_all/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "angel_tv_indo_china",
-    "name": "Angel TV Indo-China",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://janya-digimix.akamaized.net/vglive-sk-703035/indochina/ngrp:angelindochina_all/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "angel_tv_indonesia",
-    "name": "Angel TV Indonesia",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://janya-digimix.akamaized.net/vglive-sk-234616/indonesia/ngrp:angelindonesia_all/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "arputhar_yesu_tv",
-    "name": "Arputhar Yesu TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://account33.livebox.co.in/jesushelpshls/live.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "chithiram_tv",
-    "name": "Chithiram Tv",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "https://cdn.pishow.tv/ott/live/1243/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "colors_tamil_hd",
-    "name": "Colors Tamil HD",
-    "cat": "Tamil",
-    "icon": "✨",
-    "url": "https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorstamilhd11.smil/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "dd_tamil",
-    "name": "DD Tamil",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://cdn-2.pishow.tv/live/26/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "dharsan_tv",
-    "name": "Dharsan TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://cable91tataplay.akamaized.net/live/dharshantv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "etv_bal_bharat",
-    "name": "ETV Bal Bharat",
-    "cat": "Tamil",
-    "icon": "👶",
-    "url": "http://103.185.24.134:3001/ETV-BAL-BHARAT/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "go_usa",
-    "name": "Go USA",
-    "cat": "English",
-    "icon": "📺",
-    "url": "https://brandusa-gousa-1-in.samsung.wurl.tv/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "hebron_tv",
-    "name": "Hebron TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://account20.livebox.co.in/charleshls/live.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "hosanna_tv",
-    "name": "Hosanna TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://asia.mslivestream.net/mslive/bfba54c5c96a6359e2da0ca35f4998af.sdp/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "ibc_tamil",
-    "name": "IBC Tamil",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://ibc.massstream.net/IBC/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "makkal_tv_576i",
-    "name": "Makkal TV (576i)",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://5k8q87azdy4v-hls-live.wmncdn.net/MAKKAL/271ddf829afeece44d8732757fba1a66.sdp/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "moon_tv",
-    "name": "Moon Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://player.mslivestream.net/mslive/e10bb900976df9177b9a080314f26f86.sdp/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "ntc_tv",
-    "name": "NTC TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://galaxyott.live/hls/ntv.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "national_geographic",
-    "name": "National Geographic",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "http://main.light-ott.net:80/play/live.php?mac=00:1A:79:17:28:41&stream=373017&extension=ts&play_token=zCaGy5dtla",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "news_j",
-    "name": "News J",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://cdn.pishow.tv/ott/live/1279/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "news18_tamil_nadu",
-    "name": "News18 Tamil Nadu",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://n18syndication.akamaized.net/bpk-tv/News18_Tamil_Nadu_NW18_MOB/output01/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "om_tv",
-    "name": "OM TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://mumt01.tangotv.in/O5aw8Zn3OMTV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "oli_tv",
-    "name": "Oli TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://live.olidigital.in/olitv/olitv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "peppers_tv",
-    "name": "Peppers Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://cdn-2.pishow.tv/live/1383/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "polimer_news",
-    "name": "Polimer news",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://live-cf-polimernews.dailyhunt.in/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "raj_digital_plus",
-    "name": "Raj Digital Plus",
-    "cat": "Tamil",
-    "icon": "🎬",
-    "url": "https://livestream.rajtv.tv/hlslive/Admin/px08241087/live/RajTV_Digital_plus/master_1.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "raj_musix_tamil",
-    "name": "Raj Musix Tamil",
-    "cat": "Tamil",
-    "icon": "🎵",
-    "url": "https://livestream.rajtv.tv/hlslive/Admin/px08241087/live/Raj_Musix/master_1.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "raj_tv",
-    "name": "Raj TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://livestream.rajtv.tv/hlslive/Admin/px08241087/live/RAJTV/master_1.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "rakuten_action_movies",
-    "name": "Rakuten Action Movies",
-    "cat": "English",
-    "icon": "📺",
-    "url": "https://54045f0c40fd442c8b06df076aaf1e85.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6065/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "rakuten_family_movies",
-    "name": "Rakuten Family Movies",
-    "cat": "English",
-    "icon": "📺",
-    "url": "https://e3207568b726401995c25670faaf32e4.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-6203/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "rakuten_top_movies",
-    "name": "Rakuten Top Movies",
-    "cat": "English",
-    "icon": "📺",
-    "url": "https://0145451975a64b35866170fd2e8fa486.mediatailor.eu-west-1.amazonaws.com/v1/master/0547f18649bd788bec7b67b746e47670f558b6b2/production-LiveChannel-5987/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "roja_hd_tv",
-    "name": "Roja HD Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://live.rojatv.cloud/rojatv/rojatv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "roja_tv",
-    "name": "Roja Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://stream.rojatv.cloud/rojatv/rojatv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sai_tv",
-    "name": "Sai TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt03.tangotv.in/Dsly5z3HSAITV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sairam_tv",
-    "name": "Sairam TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "https://mumt04.tangotv.in/m18aqlK4SAIRAMTV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sanaa_tv",
-    "name": "Sanaa Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://vglivessai.akamaized.net/us/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b6d9e864-ec16-410a-804d-ccf8f720bfaa/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sirippoli_hd",
-    "name": "Sirippoli HD",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://yuppmedtaorire.akamaized.net/v1/manifest/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/siripoli_nim_https/c4e6500f-ea05-4226-810e-2833ee0075ff/0.m3u8",
-    "status": "Dead",
-    "live": false,
     "resolution": "704x396"
-  },
-  {
-    "id": "sivan_tv",
-    "name": "Sivan TV",
-    "cat": "Tamil",
-    "icon": "🪷",
-    "url": "http://sivantv.livebox.co.in/sivantvhls/sivan.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sony_max_2",
-    "name": "Sony MAX 2",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://sl.vodep39240327.workers.dev/channel/SONY%20MAX%202.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sony_max_hd",
-    "name": "Sony MAX HD",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://sl.vodep39240327.workers.dev/channel/SONY%20MAX%20HD.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sony_wah",
-    "name": "Sony WAH",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://sl.vodep39240327.workers.dev/channel/SONY%20WAH.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sooriyan_tv",
-    "name": "Sooriyan TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://live20.bozztv.com/giatv/giatv-Infinittyott/Infinittyott/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "star_vijay_hd",
-    "name": "Star Vijay HD",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://peaky.techcoder40.workers.dev/776.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "studio_one_tv",
-    "name": "Studio One Tv",
-    "cat": "Telugu",
-    "icon": "📺",
-    "url": "https://cdn-1.pishow.tv/live/276/master.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "subin_tv",
-    "name": "Subin Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://stream.galaxyott.live/live/subintv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "suriya_tv",
-    "name": "Suriya Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://stream.ottlive.co.in/suryatvtamil/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "suriyan_tv",
-    "name": "Suriyan Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://stream.sscloud7.com/live/suriyantv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "tvi_hd",
-    "name": "TVI HD",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://live.cmr24.fm/TVI/HD/chunks.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "thalaa_tv",
-    "name": "Thalaa Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://streams2.sofast.tv/ptnr-yupptv/title-THALAA-TV-TAM/sofastplayout/981f8f06-782a-4962-b5e0-7dcccd65279c_0_HLS/manifest.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "thanthi_tv",
-    "name": "Thanthi Tv",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://streams.tangotv.in/THANTHITV/ORIGIN/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "tharun_movies",
-    "name": "Tharun Movies",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://streaming.livebox.co.in/tharunmovieshls/live.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "toonami_movie",
-    "name": "Toonami Movie",
-    "cat": "English",
-    "icon": "📺",
-    "url": "http://api.toonamiaftermath.com:3000/movies/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "travel_xp_hd_tv",
-    "name": "Travel XP HD Tv",
-    "cat": "English",
-    "icon": "📺",
-    "url": "https://deltatesttatasky.akamaized.net/out/i/968284.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "travelxp_hd",
-    "name": "Travelxp HD",
-    "cat": "Tamil",
-    "icon": "🌍",
-    "url": "https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "ultimate_hd_tv",
-    "name": "Ultimate HD Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://stream.ottlive.co.in/utvtamil/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "ultimate_tv",
-    "name": "Ultimate Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumbai-edge.smartplaytv.in/utv/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "vaanavil_tv",
-    "name": "Vaanavil Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://6n3yope4d9ok-hls-live.5centscdn.com/vaanavil/TV.stream/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "vasanth_tv",
-    "name": "Vasanth TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt04.tangotv.in/m18aqlK4VASANTHTV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "velicham_tv",
-    "name": "Velicham Tv",
-    "cat": "Tamil",
-    "icon": "☀️",
-    "url": "https://mumt05.tangotv.in/87NeALx2VALICHAMPLUS/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "vendhar_tv",
-    "name": "Vendhar TV",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt04.tangotv.in/m18aqlK4VENDHARTV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "win_tv",
-    "name": "Win Tv",
-    "cat": "Tamil",
-    "icon": "📺",
-    "url": "https://mumt06.tangotv.in/qYyB8fXVWINTV/index.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "zee_south_flix_tv",
-    "name": "Zee South Flix Tv",
-    "cat": "Hindi",
-    "icon": "📺",
-    "url": "https://amg00862-amg00862c9-amgplt0173.playout.now3.amagi.tv/playlist/amg00862-amg00862c9-amgplt0173/playlist.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "zee_tamil_news",
-    "name": "Zee Tamil News",
-    "cat": "Tamil",
-    "icon": "📰",
-    "url": "https://raw.githubusercontent.com/amazeyourself/adaptive-streams/refs/heads/main/streams/in/ZMCL/ZeeTamilNews.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
   }
 ];
 
-let currentHls = null;
-let activeChannel = channelData[0];
+let activeChannel = channelData[0] || {};
 let currentFilter = 'all';
+let currentHls = null;
 let currentLevelIndex = -1;
+let lastSyncTimestamp = Date.now();
+
+const GOOGLE_SHEET_CSV_FALLBACK = "https://docs.google.com/spreadsheets/d/1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc/export?format=csv";
+
+// Category Icons Mapping
+const CAT_ICONS = {
+  "Tamil": "📺",
+  "English": "🌐",
+  "Hindi": "🎬",
+  "Malayalam": "🌴",
+  "Telugu": "⚡",
+  "Kids": "👶",
+  "Music": "🎵",
+  "News": "📰"
+};
+
+// --- DYNAMIC GOOGLE SHEET SYNC ENGINE ---
+
+async function fetchChannelsFromSheet(isManual = false) {
+  const btn = document.getElementById('btnSyncPlaylist');
+  const label = document.getElementById('syncBtnLabel');
+  const spinIcon = document.getElementById('syncSpinIcon');
+
+  if (btn) btn.classList.add('spinning');
+  if (label) label.innerText = 'Syncing...';
+
+  try {
+    let freshChannels = null;
+
+    // Strategy 1: Fetch via Django backend API endpoint
+    try {
+      const apiResp = await fetch(`/streams/api/channels/?refresh=${isManual}&t=${Date.now()}`, {
+        headers: { 'Accept': 'application/json' }
+      });
+      if (apiResp.ok) {
+        const json = await apiResp.json();
+        if (json.status === 'success' && Array.isArray(json.channels) && json.channels.length > 0) {
+          freshChannels = json.channels;
+        }
+      }
+    } catch (apiErr) {
+      console.warn('[Sync Engine] Backend API not reachable, falling back to direct Google Sheet CSV...', apiErr);
+    }
+
+    // Strategy 2: Direct Client-side fetch from Google Sheet CSV (native CORS supported)
+    if (!freshChannels) {
+      const csvResp = await fetch(`${GOOGLE_SHEET_CSV_FALLBACK}&t=${Date.now()}`);
+      if (csvResp.ok) {
+        const csvText = await csvResp.text();
+        freshChannels = parseCsvToChannels(csvText);
+      }
+    }
+
+    if (freshChannels && freshChannels.length > 0) {
+      // Retain currently active channel if present in new list
+      const prevActiveId = activeChannel ? activeChannel.id : null;
+      channelData = freshChannels;
+
+      if (prevActiveId) {
+        const found = channelData.find(c => c.id === prevActiveId || c.url === activeChannel.url);
+        if (found) activeChannel = found;
+      }
+
+      // Update UI components
+      renderCategoryPills(channelData);
+      filterChannels();
+      updateStandbyTags();
+      lastSyncTimestamp = Date.now();
+      updateSyncTimeDisplay();
+
+      if (isManual) {
+        showToast(`✅ Synced ${channelData.length} channels directly from Google Sheet!`);
+      } else {
+        console.log(`[Auto-Sync] Google Sheet synced: ${channelData.length} channels updated.`);
+      }
+    } else {
+      if (isManual) showToast('⚠️ Could not load new channels from sheet.');
+    }
+
+  } catch (err) {
+    console.error('[Sync Engine] Error syncing channels:', err);
+    if (isManual) showToast(`❌ Sync error: ${err.message}`);
+  } finally {
+    if (btn) btn.classList.remove('spinning');
+    if (label) label.innerText = 'Sync Playlist';
+  }
+}
+
+function manualRefreshPlaylist() {
+  fetchChannelsFromSheet(true);
+}
+
+// 5-Minute Automated Interval Sync
+const AUTO_SYNC_INTERVAL_MS = 5 * 60 * 1000;
+setInterval(() => {
+  console.log('[Auto-Sync] 5-minute timer reached. Checking Google Sheet for updates...');
+  fetchChannelsFromSheet(false);
+}, AUTO_SYNC_INTERVAL_MS);
+
+// Update last synced relative time every 30 seconds
+setInterval(updateSyncTimeDisplay, 30000);
+
+function updateSyncTimeDisplay() {
+  const timeEl = document.getElementById('syncTime');
+  if (!timeEl) return;
+  const elapsedSec = Math.floor((Date.now() - lastSyncTimestamp) / 1000);
+  if (elapsedSec < 45) {
+    timeEl.innerText = 'Synced just now';
+  } else if (elapsedSec < 120) {
+    timeEl.innerText = 'Synced 1 min ago';
+  } else {
+    timeEl.innerText = `Synced ${Math.floor(elapsedSec / 60)} min ago`;
+  }
+}
+
+function parseCsvToChannels(csvText) {
+  const lines = csvText.split(/\r?\n/).filter(line => line.trim().length > 0);
+  const channels = [];
+  const seenUrls = new Set();
+
+  for (let i = 0; i < lines.length; i++) {
+    // Simple CSV row parser handling quotes
+    const row = parseCsvLine(lines[i]);
+    if (row.length < 2) continue;
+
+    const name = (row[0] || '').trim();
+    const url = (row[1] || '').trim();
+
+    if (!url.startsWith('http') || name.toUpperCase() === 'STREAM NAME') {
+      continue;
+    }
+    if (seenUrls.has(url)) continue;
+    seenUrls.add(url);
+
+    const cat = (row[2] || '').trim() || 'Tamil';
+    const icon = (row[3] || '').trim() || CAT_ICONS[cat] || '📺';
+    const status = (row[4] || '').trim() || 'Live';
+    const isLive = ['live', 'working', 'playing', 'active', 'online'].includes(status.toLowerCase());
+
+    let slug = name.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
+    if (!slug) slug = `ch_${i}`;
+
+    channels.append = channels.push({
+      id: slug,
+      name: name,
+      cat: cat,
+      icon: icon,
+      url: url,
+      status: isLive ? 'Live' : 'Dead',
+      live: isLive,
+      resolution: isLive ? 'HD' : '0x0'
+    });
+  }
+
+  channels.sort((a, b) => {
+    if (a.live !== b.live) return a.live ? -1 : 1;
+    return a.name.localeCompare(b.name);
+  });
+
+  return channels;
+}
+
+function parseCsvLine(text) {
+  const result = [];
+  let cur = '';
+  let inQuotes = false;
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i];
+    if (c === '"') {
+      if (inQuotes && text[i + 1] === '"') {
+        cur += '"';
+        i++;
+      } else {
+        inQuotes = !inQuotes;
+      }
+    } else if (c === ',' && !inQuotes) {
+      result.push(cur);
+      cur = '';
+    } else {
+      cur += c;
+    }
+  }
+  result.push(cur);
+  return result;
+}
+
+// --- DYNAMIC CATEGORY PILLS & STANDBY SHORTCUTS ---
+
+function renderCategoryPills(items) {
+  const container = document.getElementById('categoryPillsContainer');
+  if (!container) return;
+
+  const counts = { all: items.length };
+  items.forEach(ch => {
+    const c = ch.cat || 'Other';
+    counts[c] = (counts[c] || 0) + 1;
+  });
+
+  container.innerHTML = '';
+
+  // 1. "All" Pill
+  const allPill = document.createElement('div');
+  allPill.className = `pill ${currentFilter === 'all' ? 'active' : ''}`;
+  allPill.innerText = `All (${counts.all})`;
+  allPill.onclick = () => filterCategory('all', allPill);
+  container.appendChild(allPill);
+
+  // 2. Individual Category Pills (sorted by count)
+  const sortedCats = Object.keys(counts)
+    .filter(k => k !== 'all')
+    .sort((a, b) => counts[b] - counts[a]);
+
+  sortedCats.forEach(cat => {
+    const pill = document.createElement('div');
+    pill.className = `pill ${currentFilter.toLowerCase() === cat.toLowerCase() ? 'active' : ''}`;
+    pill.innerText = `${cat} (${counts[cat]})`;
+    pill.onclick = () => filterCategory(cat, pill);
+    container.appendChild(pill);
+  });
+
+  // Render standby chips
+  renderStandbyQuickChips(sortedCats, counts);
+}
+
+function renderStandbyQuickChips(cats, counts) {
+  const chipsContainer = document.getElementById('standbyQuickChips');
+  if (!chipsContainer) return;
+
+  chipsContainer.innerHTML = '<span class="quick-chip-label">Quick Jump:</span>';
+
+  cats.slice(0, 5).forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'quick-chip';
+    const icon = CAT_ICONS[cat] || '📺';
+    btn.innerText = `${icon} ${cat} (${counts[cat]})`;
+    btn.onclick = () => quickJumpCategory(cat);
+    chipsContainer.appendChild(btn);
+  });
+}
+
+function updateStandbyTags() {
+  const countTag = document.getElementById('standbyChannelCount');
+  if (countTag) countTag.innerText = `📡 ${channelData.length} CHANNELS ONLINE`;
+
+  const searchInput = document.getElementById('channelSearch');
+  if (searchInput) searchInput.placeholder = `Search ${channelData.length} channels (Tamil, English, Hindi...)`;
+
+  const standbyStatus = document.getElementById('standbyStatus');
+  if (standbyStatus && activeChannel && activeChannel.name) {
+    standbyStatus.innerText = `Ready to Stream • ${activeChannel.name} (${activeChannel.cat || 'Live'})`;
+  }
+}
 
 // --- 1. CHANNEL NAVIGATION & SEARCH ---
+
 function renderChannels(items) {
   const grid = document.getElementById('channelsGrid');
   if (!grid) return;
   grid.innerHTML = '';
+
+  if (items.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1/-1; text-align: center; padding: 2rem 1rem; color: #94a3b8; font-size: 0.85rem;">
+        No channels match your search.<br>
+        <button class="btn-sync-playlist" style="margin-top:0.75rem;" onclick="manualRefreshPlaylist()">
+          🔄 Sync from Google Sheet
+        </button>
+      </div>
+    `;
+    return;
+  }
+
   items.forEach(ch => {
     const card = document.createElement('div');
-    card.className = `channel-card ${ch.id === activeChannel.id ? 'active' : ''}`;
+    const isActive = activeChannel && (ch.id === activeChannel.id || ch.url === activeChannel.url);
+    card.className = `channel-card ${isActive ? 'active' : ''}`;
     card.id = `card-${ch.id}`;
     card.onclick = () => switchChannel(ch);
 
-    const liveBadge = ch.live ? `<span class="live-dot" title="Verified Live"></span>` : ``;
+    const liveBadge = ch.live ? `<span class="live-dot" title="Verified Live Stream"></span>` : ``;
 
     card.innerHTML = `
-      <div class="channel-card-icon">${ch.icon}</div>
+      <div class="channel-card-icon">${ch.icon || '📺'}</div>
       <div class="channel-card-title">${ch.name}</div>
       <div class="channel-card-tag">${ch.cat}</div>
       ${liveBadge}
@@ -1042,7 +342,7 @@ function renderChannels(items) {
 }
 
 function filterChannels() {
-  const q = document.getElementById('channelSearch').value.toLowerCase().trim();
+  const q = document.getElementById('channelSearch') ? document.getElementById('channelSearch').value.toLowerCase().trim() : '';
   const filtered = channelData.filter(ch => {
     const matchCat = (currentFilter === 'all' || ch.cat.toLowerCase() === currentFilter.toLowerCase());
     const matchQuery = ch.name.toLowerCase().includes(q) || ch.cat.toLowerCase().includes(q);
@@ -1054,7 +354,7 @@ function filterChannels() {
 function filterCategory(cat, el) {
   currentFilter = cat;
   document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
+  if (el) el.classList.add('active');
   filterChannels();
 }
 
@@ -1068,15 +368,21 @@ function switchChannel(channel) {
   const activeEl = document.getElementById(`card-${channel.id}`);
   if (activeEl) activeEl.classList.add('active');
 
-  document.getElementById('currentChannelName').innerText = channel.name;
-  document.getElementById('currentChannelUrl').innerText = channel.url;
-  document.getElementById('channelLogo').innerText = channel.icon;
+  const nameEl = document.getElementById('currentChannelName');
+  const urlEl = document.getElementById('currentChannelUrl');
+  const logoEl = document.getElementById('channelLogo');
 
+  if (nameEl) nameEl.innerText = channel.name;
+  if (urlEl) urlEl.innerText = channel.url;
+  if (logoEl) logoEl.innerText = channel.icon || '📺';
+
+  showStandbyOverlay(channel.name, channel.icon, channel.cat);
   playStream(channel.url);
   showToast(`Switched to ${channel.name}`);
 }
 
 // --- 2. HLS PLAYBACK & DYNAMIC RESOLUTION ---
+
 function playStream(url) {
   const video = document.getElementById('players');
   if (!video) return;
@@ -1086,7 +392,6 @@ function playStream(url) {
     currentHls = null;
   }
 
-  // Reset quality options
   resetQualityMenu();
 
   if (Hls.isSupported()) {
@@ -1133,7 +438,6 @@ function playStream(url) {
   }
 }
 
-// --- 3. DYNAMIC RESOLUTION MENU BUILDER ---
 function resetQualityMenu() {
   const list = document.getElementById('ytQualityOptions');
   if (!list) return;
@@ -1158,7 +462,6 @@ function populateQualityMenu(levels) {
     </div>
   `;
 
-  // Sort descending by height
   const sorted = levels.map((lvl, idx) => ({ ...lvl, origIdx: idx }))
                        .sort((a, b) => (b.height || 0) - (a.height || 0));
 
@@ -1186,7 +489,6 @@ function setResolution(levelIndex, label) {
 
   document.getElementById('ytQualityText').innerText = label.toUpperCase();
 
-  // Update active checkmarks
   const items = document.querySelectorAll('.yt-quality-item');
   items.forEach(it => it.classList.remove('active'));
   if (event && event.currentTarget) {
@@ -1205,7 +507,8 @@ function toggleQualityDropdown(forceState) {
   else dropdown.classList.remove('show');
 }
 
-// --- 4. YOUTUBE PLAYER CONTROLS (PLAY, VOLUME, FULLSCREEN, PiP) ---
+// --- 3. YOUTUBE PLAYER CONTROLS (PLAY, VOLUME, FULLSCREEN, PiP) ---
+
 function togglePlayPause() {
   const video = document.getElementById('players');
   if (!video) return;
@@ -1224,9 +527,9 @@ function updatePlayIcon(isPlaying) {
   const icon = document.getElementById('ytPlayIcon');
   if (!icon) return;
   if (isPlaying) {
-    icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+    icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
   } else {
-    icon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
   }
 }
 
@@ -1289,14 +592,13 @@ function toggleFullscreen() {
   const icon = document.getElementById('ytFsIcon');
   if (!document.fullscreenElement) {
     vp.requestFullscreen().catch(err => alert(err.message));
-    if (icon) icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>'; // exit fs icon
+    if (icon) icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>';
   } else {
     document.exitFullscreen();
-    if (icon) icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>'; // enter fs icon
+    if (icon) icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>';
   }
 }
 
-// Auto-hide controls timer
 let idleTimeout = null;
 function handleUserActivity() {
   const vp = document.getElementById('videoViewport');
@@ -1312,7 +614,8 @@ function handleUserActivity() {
   }, 3500);
 }
 
-// --- 5. STREAM RECORDER (SAVE MP4/WEBM LOCALLY) ---
+// --- 4. STREAM RECORDER ---
+
 let mediaRecorder = null;
 let recordedChunks = [];
 let isRecording = false;
@@ -1405,7 +708,7 @@ function saveRecordedFile() {
   const a = document.createElement('a');
   const timeStr = new Date().toISOString().replace(/[:.]/g, '-');
   a.href = url;
-  a.download = `${activeChannel.name.replace(/\s+/g, '_')}_Record_${timeStr}.${ext}`;
+  a.download = `${(activeChannel.name || 'Stream').replace(/\s+/g, '_')}_Record_${timeStr}.${ext}`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1429,7 +732,7 @@ function takeSnapshot() {
   const a = document.createElement('a');
   const timeStr = new Date().toISOString().replace(/[:.]/g, '-');
   a.href = canvas.toDataURL('image/png');
-  a.download = `${activeChannel.name.replace(/\s+/g, '_')}_Snapshot_${timeStr}.png`;
+  a.download = `${(activeChannel.name || 'Stream').replace(/\s+/g, '_')}_Snapshot_${timeStr}.png`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -1452,7 +755,8 @@ function showToast(msg) {
   }, 3500);
 }
 
-// Global Shortcuts & Events Setup
+// --- 5. INITIALIZATION & LIFECYCLE ---
+
 window.addEventListener('DOMContentLoaded', () => {
   const vp = document.getElementById('videoViewport');
   const video = document.getElementById('players');
@@ -1465,18 +769,27 @@ window.addEventListener('DOMContentLoaded', () => {
     video.addEventListener('playing', hideStandbyOverlay);
   }
 
+  // 1. Render initial channels & categories
+  renderCategoryPills(channelData);
   renderChannels(channelData);
-  switchChannel(channelData[0]);
+  updateStandbyTags();
 
+  if (channelData.length > 0) {
+    activeChannel = channelData[0];
+    switchChannel(channelData[0]);
+  }
+
+  // 2. Perform background sync to catch any newer additions in Google Sheet
+  fetchChannelsFromSheet(false);
+
+  // Setup UI event listeners
   if (playBtn) playBtn.onclick = (e) => { e.stopPropagation(); togglePlayPause(); };
   if (muteBtn) muteBtn.onclick = (e) => { e.stopPropagation(); toggleMute(); };
   if (volRange) volRange.oninput = (e) => { e.stopPropagation(); setVolume(parseFloat(e.target.value)); };
   if (qualityBtn) qualityBtn.onclick = (e) => { e.stopPropagation(); toggleQualityDropdown(); };
 
-  // Click video viewport to play/pause
   if (vp) {
     vp.onclick = (e) => {
-      // Don't toggle if clicking inside controls or quality menu
       if (e.target.closest('.yt-controls-wrapper')) return;
       togglePlayPause();
     };
@@ -1490,14 +803,12 @@ window.addEventListener('DOMContentLoaded', () => {
     };
   }
 
-  // Close quality dropdown when clicking outside
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.yt-quality-container')) {
       toggleQualityDropdown(false);
     }
   });
 
-  // Keyboard Shortcuts
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
     if (e.code === 'Space') {
@@ -1527,7 +838,6 @@ function startStreamPlayback() {
       updatePlayIcon(true);
     }).catch(err => {
       console.log('Playback interaction error:', err);
-      // Fallback: start muted if browser restricts sound
       video.muted = true;
       video.play().then(() => {
         updatePlayIcon(true);
@@ -1552,7 +862,7 @@ function showStandbyOverlay(name, icon, cat) {
     const statusEl = document.getElementById('standbyStatus');
     const subEl = document.getElementById('standbySubtitle');
     const playBtnText = document.getElementById('standbyPlayBtnText');
-    
+
     if (titleEl) titleEl.innerText = name;
     if (logoEl) logoEl.innerText = icon || '📺';
     if (statusEl) statusEl.innerText = `Ready to Stream • ${name} (${cat || 'Live'})`;
@@ -1565,15 +875,13 @@ function showStandbyOverlay(name, icon, cat) {
 function quickJumpCategory(catName) {
   const pills = document.querySelectorAll('.pill');
   for (const p of pills) {
-    if (p.innerText.includes(catName)) {
+    if (p.innerText.toLowerCase().startsWith(catName.toLowerCase())) {
       p.click();
       break;
     }
   }
-  // Also switch to first channel in that category
   const match = channelData.find(c => c.cat.toLowerCase() === catName.toLowerCase());
   if (match) {
     switchChannel(match);
   }
 }
-

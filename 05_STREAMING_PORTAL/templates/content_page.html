@@ -26,7 +26,7 @@
 
     <div class="nav-search">
       <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.4-5.4a8 8 0 1 0-1.42 1.42l5.4 5.4a1 1 0 0 0 1.42-1.42zM10 16a6 6 0 1 1 6-6 6 6 0 0 1-6 6z"/></svg>
-      <input type="text" id="channelSearch" placeholder="Search 123 channels (Tamil, English, Hindi...)" oninput="filterChannels()">
+      <input type="text" id="channelSearch" placeholder="Search channels..." oninput="filterChannels()">
     </div>
 
     <div class="nav-user-menu">
@@ -50,7 +50,7 @@
           <span id="recTimer" style="font-family: monospace;">00:00</span>
         </div>
 
-        <!-- Video Element (No ugly default road image!) -->
+        <!-- Video Element -->
         <video id="players" playsinline></video>
 
         <!-- Modern High-Tech Standby / Live Splash Overlay -->
@@ -63,7 +63,7 @@
                 <span>NEXUS STREAM ENGINE • LIVE HUB</span>
               </div>
               <div class="standby-count-tag">
-                <span>📡 123 CHANNELS ONLINE</span>
+                <span id="standbyChannelCount">📡 {{ channel_count|default:"36" }} CHANNELS ONLINE</span>
               </div>
             </div>
 
@@ -77,7 +77,7 @@
 
             <div class="standby-status-pill">
               <span class="standby-live-pulse"></span>
-              <span id="standbyStatus">Ready to Stream • Kalaignar TV (Tamil HD)</span>
+              <span id="standbyStatus">Ready to Stream</span>
             </div>
 
             <!-- Animated Soundwave Equalizer -->
@@ -100,13 +100,8 @@
             </div>
 
             <!-- Quick Jump Shortcuts -->
-            <div class="standby-quick-chips">
-              <span class="quick-chip-label">Quick Jump:</span>
-              <button class="quick-chip" onclick="quickJumpCategory('Tamil')">🔥 Tamil (104)</button>
-              <button class="quick-chip" onclick="quickJumpCategory('English')">🌐 English (8)</button>
-              <button class="quick-chip" onclick="quickJumpCategory('Hindi')">🎬 Hindi (8)</button>
-              <button class="quick-chip" onclick="quickJumpCategory('Malayalam')">🌴 Malayalam</button>
-              <button class="quick-chip" onclick="quickJumpCategory('Telugu')">⚡ Telugu</button>
+            <div class="standby-quick-chips" id="standbyQuickChips">
+              <!-- Dynamically populated from Google Sheet -->
             </div>
 
           </div>
@@ -190,8 +185,8 @@
         <div class="current-channel-info">
           <div id="channelLogo" class="channel-logo-display">📺</div>
           <div class="channel-meta">
-            <h3 id="currentChannelName">Kalaignar TV</h3>
-            <p id="currentChannelUrl">https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8</p>
+            <h3 id="currentChannelName">Loading Stream...</h3>
+            <p id="currentChannelUrl">Connecting to Google Sheet playlist...</p>
           </div>
         </div>
 
@@ -207,15 +202,30 @@
 
     <!-- Right Sidebar -->
     <div class="sidebar-panel">
-                        <div class="category-pills">
-        <div class="pill active" onclick="filterCategory('all', this)">All (123)</div>
-        <div class="pill" onclick="filterCategory('Tamil', this)">Tamil (104)</div>
-        <div class="pill" onclick="filterCategory('English', this)">English (8)</div>
-        <div class="pill" onclick="filterCategory('Hindi', this)">Hindi (8)</div>
-        <div class="pill" onclick="filterCategory('Malayalam', this)">Malayalam (2)</div>
-        <div class="pill" onclick="filterCategory('Telugu', this)">Telugu (1)</div>
+      
+      <!-- Playlist Sync Bar with Refresh Button -->
+      <div class="playlist-sync-bar">
+        <div class="sync-status-info">
+          <span class="sync-pulse-dot" id="syncPulseDot"></span>
+          <span class="sync-label">Google Sheet</span>
+          <span class="sync-time" id="syncTime">Synced just now</span>
+        </div>
+        <button id="btnSyncPlaylist" class="btn-sync-playlist" onclick="manualRefreshPlaylist()" title="Sync channels now with Google Sheet">
+          <svg id="syncSpinIcon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <polyline points="1 20 1 14 7 14"></polyline>
+            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+          </svg>
+          <span id="syncBtnLabel">Sync Playlist</span>
+        </button>
       </div>
 
+      <!-- Dynamic Category Pills -->
+      <div class="category-pills" id="categoryPillsContainer">
+        <!-- Rendered dynamically by modern_player.js -->
+      </div>
+
+      <!-- Channels Scroll Grid -->
       <div id="channelsGrid" class="channels-scroll-list"></div>
     </div>
 
@@ -223,6 +233,10 @@
 
   <div id="toastContainer" class="toast-container"></div>
 
+  <!-- Server-injected Google Sheet Channels Data -->
+  <script>
+    window.INITIAL_CHANNELS = {{ channels_json|safe|default:"[]" }};
+  </script>
   <script src="{% static 'js/modern_player.js' %}"></script>
 </body>
 </html>

@@ -141,6 +141,13 @@
      - Confirmed direct write access: executed live status update across all 36 active channels directly in the Google Sheet.
      - Verified new addition: `Sony Pix HD` (`https://cloudplay-sonyliv.pages.dev/pixhd.m3u8`) confirmed playing live video frames (`384x216`), added to portal, and synced to Google Sheet.
      - Captured live portal verification screenshots: `live_verified_portal_dashboard.png` and `live_verified_stream_playing.png`.
+   - **Dynamic Google Sheet as Main Playlist Library & Auto-Sync Engine**:
+     - Transformed Google Sheet (`1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc`) into the single source of truth for all web app channels.
+     - Completely replaced hardcoded playlist arrays in Python (`views.py`) and static JS with dynamic fetching and caching (`/streams/api/channels/` + client-side direct CSV fallback).
+     - Built interactive **Playlist Sync Bar** in Web App sidebar with real-time status (`🟢 Google Sheet`), relative sync timer (`Synced just now`), and manual `🔄 Sync Playlist` refresh button with spinning indicator and toast notifications.
+     - Configured automated background interval syncing **every 5 minutes** so any new channels or categories added to the Google Sheet reflect automatically without app restart.
+     - Implemented dynamic category pill generator that calculates exact channel counts and category chips on the fly (`All (36)`, `Tamil (31)`, `Hindi (3)`, `English (2)`).
+     - Verified live on PythonAnywhere via automated Selenium testing (`live_sync_portal_dashboard.png`, `live_sync_toast_active.png`).
 
 ---
 
