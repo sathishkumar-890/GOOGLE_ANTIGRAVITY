@@ -747,6 +747,41 @@ function showCastGuidePrompt(ch) {
   showToast(`📺 Cast Tip: Connect TV to same Wi-Fi. In Chrome/Edge, click (⋮) ➔ Cast to TV.`);
 }
 
+function openInPhonePlayer(targetChannel) {
+  const ch = targetChannel || activeChannel;
+  if (!ch || !ch.url) {
+    showToast('⚠️ Please select a channel first.');
+    return;
+  }
+
+  const isAndroid = /Android/i.test(navigator.userAgent);
+  const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isAndroid) {
+    // Android Chrome Intent to launch system video player or installed player (MX Player, etc.)
+    const cleanUrl = ch.url.replace(/^https?:\/\//, '');
+    const scheme = ch.url.startsWith('https') ? 'https' : 'http';
+    const intentUrl = `intent://${cleanUrl}#Intent;scheme=${scheme};type=video/*;end`;
+    window.location.href = intentUrl;
+    showToast(`📱 Opening "${ch.name}" in your phone video player...`);
+  } else if (isIOS) {
+    // On iOS Safari: play natively in full screen
+    const video = document.getElementById('players');
+    if (video) {
+      video.src = ch.url;
+      video.play().then(() => {
+        if (video.webkitEnterFullscreen) video.webkitEnterFullscreen();
+      }).catch(() => {
+        window.open(ch.url, '_blank');
+      });
+    }
+    showToast(`📱 Opening in iOS native player...`);
+  } else {
+    // Desktop: Launch VLC 1-Click
+    launchVlcStream(ch);
+  }
+}
+
 function launchVlcStream(targetChannel) {
   const ch = targetChannel || activeChannel;
   if (!ch || !ch.url) {

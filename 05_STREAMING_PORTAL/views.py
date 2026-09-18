@@ -3,7 +3,7 @@ from welcomeapp.forms import login_form
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User
 from django.urls import reverse
-from django.http import HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseRedirect, JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
 from welcomeapp.models import UserInfo
 
@@ -104,6 +104,28 @@ def api_channels(request):
         "channels": channels,
         "timestamp": int(time.time())
     })
+
+def proxy_stream(request):
+    target_url = request.GET.get('url', 'https://cloudplay-sonyliv.pages.dev/pixhd.m3u8')
+    if not target_url or not target_url.startswith(('http://', 'https://')):
+        return JsonResponse({"status": "error", "message": "Invalid URL"}, status=400)
+    try:
+        req = urllib.request.Request(
+            target_url,
+            headers={
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+            }
+        )
+        with urllib.request.urlopen(req, timeout=8) as resp:
+            content = resp.read()
+            content_type = resp.headers.get("Content-Type", "application/vnd.apple.mpegurl")
+            response = HttpResponse(content, content_type=content_type)
+            response["Access-Control-Allow-Origin"] = "*"
+            response["Access-Control-Allow-Headers"] = "*"
+            response["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            return response
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=502)
 
 def feedbacks(request):
     return render(request, 'welcomeapp/feedbacks.html')

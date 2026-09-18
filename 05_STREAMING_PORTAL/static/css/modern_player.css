@@ -504,6 +504,25 @@ video {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
 }
+.btn-mobile-play {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-mobile-play:hover {
+  background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+}
 .btn-vlc-action {
   background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
   color: #fff;

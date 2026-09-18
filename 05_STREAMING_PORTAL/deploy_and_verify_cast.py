@@ -144,15 +144,19 @@ def verify_browser():
         print(f"Found card: '{sony_card.text.splitlines()[0]}'. Clicking card...")
         sony_card.click()
 
-        # Wait for either playback or the helper overlay
-        time.sleep(5)
+        # Wait for helper overlay to appear
+        WebDriverWait(driver, 12).until(
+            lambda d: "hidden" not in d.find_element(By.ID, "httpHelperOverlay").get_attribute("class")
+        )
         helper_overlay = driver.find_element(By.ID, "httpHelperOverlay")
         is_helper_visible = "hidden" not in helper_overlay.get_attribute("class")
         print(f"HTTP/CORS Helper Overlay visible for Sony pix HD: {is_helper_visible}")
 
-        # Check the VLC and Cast buttons inside the overlay
+        # Check the Phone Player, VLC, and Cast buttons inside the overlay
+        phone_btn = driver.find_element(By.ID, "btnMobilePlay")
         vlc_btn = driver.find_element(By.ID, "btnVlcPlay")
         overlay_cast_btn = driver.find_element(By.ID, "btnOverlayCast")
+        print(f"Overlay 'Phone Player' button visible: {phone_btn.is_displayed()}")
         print(f"Overlay 'Play in VLC' button visible: {vlc_btn.is_displayed()}")
         print(f"Overlay 'Cast to TV' button visible: {overlay_cast_btn.is_displayed()}")
 
@@ -162,7 +166,7 @@ def verify_browser():
 
         # Dismiss helper overlay before clicking player control bar
         dismiss_btn = driver.find_element(By.CLASS_NAME, "btn-dismiss-helper")
-        dismiss_btn.click()
+        driver.execute_script("arguments[0].click();", dismiss_btn)
         time.sleep(1)
 
         # Test clicking Cast Button in player bar

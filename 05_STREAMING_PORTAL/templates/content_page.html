@@ -95,11 +95,19 @@
             </div>
 
             <div class="http-actions-row">
+              <button class="btn-mobile-play" id="btnMobilePlay" onclick="openInPhonePlayer()" title="Open in Phone Video Player (Android / MX Player)">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+                  <line x1="12" y1="18" x2="12.01" y2="18"></line>
+                </svg>
+                <span>Phone Player (1-Tap)</span>
+              </button>
+
               <button class="btn-external-play btn-vlc-action" id="btnVlcPlay" onclick="launchVlcStream()" title="Play in VLC Media Player">
                 <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M12 2L4 18h16L12 2zm0 4.2l4.8 9.8H7.2L12 6.2zM2 20h20v2H2v-2z"/>
                 </svg>
-                <span>Play in VLC (1-Click)</span>
+                <span>Play in VLC</span>
               </button>
 
               <button class="btn-cast-action" id="btnOverlayCast" onclick="castStreamToTv()" title="Cast to Smart TV / Chromecast">
