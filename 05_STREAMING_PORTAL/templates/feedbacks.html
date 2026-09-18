@@ -1,0 +1,31 @@
+{% extends 'welcomeapp/home.html' %}
+{% load static %}
+
+{% block body_block %}
+<div class="login-wrapper">
+    <div class="login-card" style="text-align: center;">
+        <div class="card-header">
+            <div class="card-icon">
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+            </div>
+            <h1 class="card-title">Feedback & Support</h1>
+            <p class="card-subtitle">We would love to hear your thoughts</p>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.04); border: 1px solid var(--border-glow); border-radius: 1rem; padding: 1.5rem; margin: 1.5rem 0;">
+            <p style="font-size: 0.92rem; color: var(--text-muted); margin-bottom: 0.75rem;">
+                Kindly submit your feedback, stream requests, or questions directly to:
+            </p>
+            <a href="mailto:sathishkumar18597@gmail.com" style="color: #f87171; font-size: 1.05rem; font-weight: 700; word-break: break-all; text-decoration: none;">
+                sathishkumar18597@gmail.com
+            </a>
+        </div>
+
+        <a href="{% url 'login' %}" class="btn-submit" style="text-decoration: none; display: inline-flex;">
+            ← Back to Login
+        </a>
+    </div>
+</div>
+{% endblock %}

@@ -1,6 +1,6 @@
 # Chat Archive: PHOTO_EDITING
 
-- **Conversation ID**: 3458776a-a478-4c43-b243-2ead24ade8de
+- **Conversation ID**: `3458776a-a478-4c43-b243-2ead24ade8de`
 - **Last Modified**: 2026-09-16 01:15:03.7852995+00:00
 - **Total Messages**: 20
 

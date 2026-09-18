@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Parallel Stream Playback Verifier</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body style="background:#0a0a0f; color:#eee; font-family:sans-serif;">
+    <h3>Active Video Playback Test Chamber</h3>
+    <div id="videoGrid" style="display:flex; flex-wrap:wrap; gap:8px;"></div>
+    <script>
+        window.testSingleChannel = function(ch, timeoutMs) {
+            return new Promise((resolve) => {
+                const grid = document.getElementById('videoGrid');
+                const box = document.createElement('div');
+                box.style.border = '1px solid #333';
+                box.style.padding = '4px';
+                box.id = 'box_' + ch.id;
+
+                const label = document.createElement('div');
+                label.style.fontSize = '10px';
+                label.textContent = '#' + ch.row + ' ' + ch.name;
+                box.appendChild(label);
+
+                const video = document.createElement('video');
+                video.muted = true;
+                video.playsInline = true;
+                video.style.width = '120px';
+                video.style.height = '68px';
+                video.style.background = '#000';
+                box.appendChild(video);
+                grid.appendChild(box);
+
+                let hls = null;
+                let resolved = false;
+                let fatalReason = null;
+
+                function finish(result) {
+                    if (resolved) return;
+                    resolved = true;
+                    clearInterval(checker);
+                    clearTimeout(timer);
+                    if (hls) {
+                        try { hls.destroy(); } catch(e) {}
+                    }
+                    try { video.pause(); video.src = ''; box.remove(); } catch(e) {}
+                    resolve(result);
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        enableWorker: false,
+                        manifestLoadingTimeOut: 5000,
+                        manifestLoadingMaxRetry: 0,
+                        levelLoadingTimeOut: 5000,
+                        levelLoadingMaxRetry: 0,
+                        fragLoadingTimeOut: 5000,
+                        fragLoadingMaxRetry: 0,
+                        startFragPrefetch: true
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            fatalReason = (data.details || data.type) + (data.response ? (' ' + data.response.code) : '');
+                            finish({
+                                row: ch.row,
+                                name: ch.name,
+                                url: ch.url,
+                                playing: false,
+                                reason: fatalReason,
+                                resolution: '0x0',
+                                currentTime: 0
+                            });
+                        }
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(() => {});
+                    });
+
+                    hls.loadSource(ch.url);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = ch.url;
+                    video.addEventListener('loadedmetadata', () => video.play().catch(() => {}));
+                } else {
+                    finish({
+                        row: ch.row,
+                        name: ch.name,
+                        url: ch.url,
+                        playing: false,
+                        reason: 'HLS not supported',
+                        resolution: '0x0',
+                        currentTime: 0
+                    });
+                    return;
+                }
+
+                const startTime = Date.now();
+                const checker = setInterval(() => {
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    const w = video.videoWidth;
+                    const h = video.videoHeight;
+                    const ct = video.currentTime;
+
+                    // STRICT VIDEO PLAYBACK CRITERION:
+                    // 1. Decoded video width > 0 and height > 0
+                    // 2. Playback progress currentTime > 0.1s
+                    // 3. Not paused, active frame decoding
+                    if (w > 0 && h > 0 && ct > 0.1) {
+                        finish({
+                            row: ch.row,
+                            name: ch.name,
+                            url: ch.url,
+                            playing: true,
+                            reason: 'Video frames actively playing',
+                            resolution: w + 'x' + h,
+                            currentTime: Math.round(ct * 10) / 10,
+                            elapsedSeconds: Math.round(elapsed * 10) / 10
+                        });
+                    }
+                }, 150);
+
+                const timer = setTimeout(() => {
+                    finish({
+                        row: ch.row,
+                        name: ch.name,
+                        url: ch.url,
+                        playing: false,
+                        reason: fatalReason || 'Timeout: No video frames decoded within ' + (timeoutMs/1000) + 's',
+                        resolution: (video.videoWidth || 0) + 'x' + (video.videoHeight || 0),
+                        currentTime: Math.round((video.currentTime || 0) * 10) / 10
+                    });
+                }, timeoutMs);
+            });
+        };
+
+        window.testBatch = function(channels, timeoutMs) {
+            return Promise.all(channels.map(ch => window.testSingleChannel(ch, timeoutMs)));
+        };
+    </script>
+</body>
+</html>

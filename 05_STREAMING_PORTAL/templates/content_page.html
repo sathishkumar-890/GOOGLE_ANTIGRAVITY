@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Home - Live Streaming Portal</title>
+  <link rel="shortcut icon" type="image/png" href="{% static 'images/owl.png' %}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{% static 'css/modern_player.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span>NEXUS STREAM</span>
+      <span class="brand-badge">PRO IPTV</span>
+    </div>
+
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.4-5.4a8 8 0 1 0-1.42 1.42l5.4 5.4a1 1 0 0 0 1.42-1.42zM10 16a6 6 0 1 1 6-6 6 6 0 0 1-6 6z"/></svg>
+      <input type="text" id="channelSearch" placeholder="Search 123 channels (Tamil, English, Hindi...)" oninput="filterChannels()">
+    </div>
+
+    <div class="nav-user-menu">
+      <a href="/streams/feedback/" class="nav-link">Feedback</a>
+      <span class="nav-user">User: <strong>{{ request.user.username|default:"user" }}</strong></span>
+      <a href="/logout/" class="btn btn-secondary" style="text-decoration: none;">Logout</a>
+    </div>
+  </nav>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    
+    <!-- Left Column: Player & Recording Studio -->
+    <div class="player-section">
+      <div class="video-viewport" id="videoViewport">
+        
+        <!-- Live Recording Indicator -->
+        <div id="recOverlay" class="rec-overlay">
+          <div class="rec-dot"></div>
+          <span>REC</span>
+          <span id="recTimer" style="font-family: monospace;">00:00</span>
+        </div>
+
+        <!-- Video Element (No ugly default road image!) -->
+        <video id="players" playsinline></video>
+
+        <!-- Modern High-Tech Standby / Live Splash Overlay -->
+        <div class="stream-standby-overlay" id="standbyOverlay">
+          <div class="standby-glass-card">
+            
+            <div class="standby-top-badge-row">
+              <div class="standby-network-tag">
+                <span class="standby-live-pulse"></span>
+                <span>NEXUS STREAM ENGINE • LIVE HUB</span>
+              </div>
+              <div class="standby-count-tag">
+                <span>📡 123 CHANNELS ONLINE</span>
+              </div>
+            </div>
+
+            <div class="standby-logo-glow" id="standbyLogo">✨</div>
+
+            <div class="standby-title-group">
+              <div class="standby-welcome-user">WELCOME BACK, <span class="user-highlight">{{ request.user.username|title|default:"VIEWER" }}</span></div>
+              <h1 class="standby-title" id="standbyTitle">Select a Stream or Watch Featured</h1>
+              <p class="standby-subtitle" id="standbySubtitle">1080p Ultra-HD • Instant Multi-Language Satellite Feeds</p>
+            </div>
+
+            <div class="standby-status-pill">
+              <span class="standby-live-pulse"></span>
+              <span id="standbyStatus">Ready to Stream • Kalaignar TV (Tamil HD)</span>
+            </div>
+
+            <!-- Animated Soundwave Equalizer -->
+            <div class="soundwave-bar-group">
+              <div class="soundwave-bar"></div>
+              <div class="soundwave-bar"></div>
+              <div class="soundwave-bar"></div>
+              <div class="soundwave-bar"></div>
+              <div class="soundwave-bar"></div>
+              <div class="soundwave-bar"></div>
+              <div class="soundwave-bar"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="standby-actions-row">
+              <button class="standby-play-btn" onclick="startStreamPlayback()">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <span id="standbyPlayBtnText">▶ START STREAMING NOW</span>
+              </button>
+            </div>
+
+            <!-- Quick Jump Shortcuts -->
+            <div class="standby-quick-chips">
+              <span class="quick-chip-label">Quick Jump:</span>
+              <button class="quick-chip" onclick="quickJumpCategory('Tamil')">🔥 Tamil (104)</button>
+              <button class="quick-chip" onclick="quickJumpCategory('English')">🌐 English (8)</button>
+              <button class="quick-chip" onclick="quickJumpCategory('Hindi')">🎬 Hindi (8)</button>
+              <button class="quick-chip" onclick="quickJumpCategory('Malayalam')">🌴 Malayalam</button>
+              <button class="quick-chip" onclick="quickJumpCategory('Telugu')">⚡ Telugu</button>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Big Center Play / Pause Indicator (YouTube Style) -->
+        <div class="yt-center-action" id="ytCenterAction">
+          <div class="yt-center-btn" id="ytCenterBtn">
+            <svg class="yt-center-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+
+        <!-- YouTube-Style Custom Bottom Control Bar -->
+        <div class="yt-controls-wrapper" id="ytControlsWrapper">
+          <div class="yt-progress-track">
+            <div class="yt-progress-line" id="ytProgressLine"></div>
+          </div>
+
+          <div class="yt-controls-bar">
+            <!-- Left Controls: Play/Pause, Volume, Live Badge -->
+            <div class="yt-controls-left">
+              <button class="yt-btn" id="ytPlayBtn" title="Play (Space)">
+                <svg class="yt-icon" id="ytPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+
+              <div class="yt-volume-group">
+                <button class="yt-btn" id="ytMuteBtn" title="Mute (M)">
+                  <svg class="yt-icon" id="ytVolIcon" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                  </svg>
+                </button>
+                <input type="range" class="yt-volume-range" id="ytVolRange" min="0" max="1" step="0.05" value="1" title="Volume">
+              </div>
+
+              <div class="yt-live-pill">
+                <span class="yt-live-dot"></span>
+                <span>LIVE</span>
+              </div>
+            </div>
+
+            <!-- Right Controls: Resolution/Quality, PiP, Fullscreen -->
+            <div class="yt-controls-right">
+              
+              <div class="yt-quality-container">
+                <button class="yt-btn yt-quality-btn" id="ytQualityBtn" title="Resolution & Quality">
+                  <svg class="yt-icon" viewBox="0 0 24 24">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                  </svg>
+                  <span id="ytQualityText" class="yt-quality-text">AUTO</span>
+                </button>
+
+                <div class="yt-quality-dropdown" id="ytQualityDropdown">
+                  <div class="yt-quality-title">Resolution / Quality</div>
+                  <div class="yt-quality-options" id="ytQualityOptions">
+                    <div class="yt-quality-item active" onclick="setResolution(-1, 'Auto')">
+                      <span class="yt-check">✓</span>
+                      <span>Auto</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PiP -->
+              <button class="yt-btn" id="ytPipBtn" onclick="togglePiP()" title="Picture in Picture">
+                <svg class="yt-icon" viewBox="0 0 24 24"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z"/></svg>
+              </button>
+
+              <!-- Fullscreen -->
+              <button class="yt-btn" id="ytFsBtn" onclick="toggleFullscreen()" title="Fullscreen (F)">
+                <svg class="yt-icon" id="ytFsIcon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+              </button>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stream Meta & Studio Control Bar -->
+      <div class="stream-header">
+        <div class="current-channel-info">
+          <div id="channelLogo" class="channel-logo-display">📺</div>
+          <div class="channel-meta">
+            <h3 id="currentChannelName">Kalaignar TV</h3>
+            <p id="currentChannelUrl">https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8</p>
+          </div>
+        </div>
+
+        <div class="studio-actions">
+          <button id="btnRecord" class="btn btn-record" onclick="toggleRecording()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            <span id="recBtnLabel">Record Stream (MP4)</span>
+          </button>
+          <button class="btn btn-secondary" onclick="takeSnapshot()" title="Capture High-Res Photo">📸 Snapshot</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-panel">
+                        <div class="category-pills">
+        <div class="pill active" onclick="filterCategory('all', this)">All (123)</div>
+        <div class="pill" onclick="filterCategory('Tamil', this)">Tamil (104)</div>
+        <div class="pill" onclick="filterCategory('English', this)">English (8)</div>
+        <div class="pill" onclick="filterCategory('Hindi', this)">Hindi (8)</div>
+        <div class="pill" onclick="filterCategory('Malayalam', this)">Malayalam (2)</div>
+        <div class="pill" onclick="filterCategory('Telugu', this)">Telugu (1)</div>
+      </div>
+
+      <div id="channelsGrid" class="channels-scroll-list"></div>
+    </div>
+
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script src="{% static 'js/modern_player.js' %}"></script>
+</body>
+</html>

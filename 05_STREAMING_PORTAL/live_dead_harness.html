@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Live vs Dead Stream Playback Verifier</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body style="background:#0b0e14; color:#fff; font-family:sans-serif;">
+    <h3>Active Video Decoder Verification Pool</h3>
+    <div id="slots" style="display:flex; gap:12px; margin-bottom:16px;"></div>
+    <div id="progress" style="font-size:14px; margin-bottom:8px;">Ready</div>
+    <div id="logs" style="font-family:monospace; font-size:11px; height:260px; overflow-y:auto; background:#161b22; padding:8px; border-radius:6px;"></div>
+    <script>
+        window.testSingleChannel = function(ch, slotIndex, timeoutMs) {
+            return new Promise((resolve) => {
+                const slots = document.getElementById('slots');
+                let slot = document.getElementById('slot_' + slotIndex);
+                if (!slot) {
+                    slot = document.createElement('div');
+                    slot.id = 'slot_' + slotIndex;
+                    slot.style.border = '1px solid #30363d';
+                    slot.style.padding = '6px';
+                    slot.style.borderRadius = '6px';
+                    slots.appendChild(slot);
+                }
+                slot.innerHTML = '<div style="font-size:11px; margin-bottom:4px; max-width:200px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"><b>Slot ' + slotIndex + ':</b> #' + ch.row + ' ' + ch.name + '</div>';
+
+                const video = document.createElement('video');
+                video.muted = true;
+                video.playsInline = true;
+                video.autoplay = true;
+                video.style.width = '180px';
+                video.style.height = '101px';
+                video.style.background = '#000';
+                slot.appendChild(video);
+
+                let hls = null;
+                let resolved = false;
+                let fatalReason = null;
+
+                function cleanup(result) {
+                    if (resolved) return;
+                    resolved = true;
+                    clearInterval(checkInterval);
+                    clearTimeout(timeoutTimer);
+                    if (hls) {
+                        try { hls.destroy(); } catch(e) {}
+                    }
+                    try {
+                        video.pause();
+                        video.src = '';
+                        video.remove();
+                    } catch(e) {}
+                    resolve(result);
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        enableWorker: false,
+                        manifestLoadingTimeOut: 6000,
+                        manifestLoadingMaxRetry: 1,
+                        levelLoadingTimeOut: 6000,
+                        levelLoadingMaxRetry: 1,
+                        fragLoadingTimeOut: 6000,
+                        fragLoadingMaxRetry: 1,
+                        startFragPrefetch: true
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            fatalReason = (data.details || data.type) + (data.response ? (' HTTP ' + data.response.code) : '');
+                            cleanup({
+                                row: ch.row,
+                                name: ch.name,
+                                url: ch.url,
+                                is_live: false,
+                                reason: fatalReason,
+                                resolution: '0x0',
+                                currentTime: 0
+                            });
+                        }
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(() => {});
+                    });
+
+                    hls.loadSource(ch.url);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = ch.url;
+                    video.addEventListener('loadedmetadata', () => video.play().catch(() => {}));
+                } else {
+                    cleanup({
+                        row: ch.row,
+                        name: ch.name,
+                        url: ch.url,
+                        is_live: false,
+                        reason: 'HLS not supported',
+                        resolution: '0x0',
+                        currentTime: 0
+                    });
+                    return;
+                }
+
+                const startTime = Date.now();
+                const checkInterval = setInterval(() => {
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    const w = video.videoWidth;
+                    const h = video.videoHeight;
+                    const ct = video.currentTime;
+
+                    // STRICT VIDEO PLAYING VERIFICATION:
+                    // 1. Both width and height must be > 0 (decoded video frame)
+                    // 2. currentTime must be advancing
+                    if (w > 0 && h > 0 && ct > 0.05) {
+                        cleanup({
+                            row: ch.row,
+                            name: ch.name,
+                            url: ch.url,
+                            is_live: true,
+                            reason: 'Video frames actively playing',
+                            resolution: w + 'x' + h,
+                            currentTime: Math.round(ct * 10) / 10,
+                            elapsedSeconds: Math.round(elapsed * 10) / 10
+                        });
+                    }
+                }, 150);
+
+                const timeoutTimer = setTimeout(() => {
+                    cleanup({
+                        row: ch.row,
+                        name: ch.name,
+                        url: ch.url,
+                        is_live: false,
+                        reason: fatalReason || 'Timeout: No video frames decoded within ' + (timeoutMs/1000) + 's',
+                        resolution: (video.videoWidth || 0) + 'x' + (video.videoHeight || 0),
+                        currentTime: Math.round((video.currentTime || 0) * 10) / 10
+                    });
+                }, timeoutMs);
+            });
+        };
+
+        // Worker pool of size N
+        window.activeResults = [];
+        window.runPool = async function(channelList, concurrency, timeoutMs) {
+            window.activeResults = [];
+            let nextIndex = 0;
+            const prog = document.getElementById('progress');
+
+            async function worker(workerId) {
+                while (nextIndex < channelList.length) {
+                    const currentIdx = nextIndex++;
+                    const ch = channelList[currentIdx];
+                    prog.textContent = 'Testing ' + (window.activeResults.length + 1) + ' / ' + channelList.length + '...';
+                    const res = await window.testSingleChannel(ch, workerId, timeoutMs);
+                    window.activeResults.push(res);
+                }
+            }
+
+            const workers = [];
+            for (let i = 0; i < concurrency; i++) {
+                workers.push(worker(i + 1));
+            }
+            await Promise.all(workers);
+            prog.textContent = 'Done! Tested ' + window.activeResults.length + ' channels.';
+            return window.activeResults;
+        };
+    </script>
+</body>
+</html>

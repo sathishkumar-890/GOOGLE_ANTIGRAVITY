@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Stream Playback Verifier</title>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body style="background:#111; color:#fff;">
+    <div id="videoContainer"></div>
+    <script>
+        window.testStream = function(testId, streamUrl, timeoutMs) {
+            return new Promise((resolve) => {
+                const container = document.getElementById('videoContainer');
+                const video = document.createElement('video');
+                video.id = 'video_' + testId;
+                video.muted = true;
+                video.playsInline = true;
+                video.style.width = '240px';
+                video.style.height = '135px';
+                container.appendChild(video);
+
+                let hls = null;
+                let resolved = false;
+                let fatalError = null;
+
+                function cleanup(result) {
+                    if (resolved) return;
+                    resolved = true;
+                    clearInterval(pollInterval);
+                    clearTimeout(timer);
+                    if (hls) {
+                        try { hls.destroy(); } catch(e) {}
+                    }
+                    try { video.pause(); video.src = ''; video.remove(); } catch(e) {}
+                    resolve(result);
+                }
+
+                if (Hls.isSupported()) {
+                    hls = new Hls({
+                        enableWorker: false,
+                        manifestLoadingTimeOut: 6000,
+                        manifestLoadingMaxRetry: 1,
+                        levelLoadingTimeOut: 6000,
+                        fragLoadingTimeOut: 6000,
+                        startFragPrefetch: true
+                    });
+
+                    hls.on(Hls.Events.ERROR, function(event, data) {
+                        if (data.fatal) {
+                            fatalError = data.type + ': ' + data.details + (data.response ? (' HTTP ' + data.response.code) : '');
+                            cleanup({
+                                playing: false,
+                                reason: fatalError,
+                                width: 0,
+                                height: 0,
+                                currentTime: 0
+                            });
+                        }
+                    });
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                        video.play().catch(() => {});
+                    });
+
+                    hls.loadSource(streamUrl);
+                    hls.attachMedia(video);
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = streamUrl;
+                    video.addEventListener('loadedmetadata', () => video.play().catch(() => {}));
+                } else {
+                    cleanup({ playing: false, reason: 'HLS not supported', width: 0, height: 0, currentTime: 0 });
+                    return;
+                }
+
+                const startTime = Date.now();
+                const pollInterval = setInterval(() => {
+                    const elapsed = (Date.now() - startTime) / 1000;
+                    const width = video.videoWidth;
+                    const height = video.videoHeight;
+                    const curTime = video.currentTime;
+
+                    if (width > 0 && height > 0 && curTime > 0.1) {
+                        cleanup({
+                            playing: true,
+                            reason: 'Video frames actively playing',
+                            width: width,
+                            height: height,
+                            currentTime: Math.round(curTime * 10) / 10,
+                            elapsedSeconds: Math.round(elapsed * 10) / 10
+                        });
+                    }
+                }, 200);
+
+                const timer = setTimeout(() => {
+                    cleanup({
+                        playing: false,
+                        reason: fatalError || 'Timeout: Video did not decode frames within ' + (timeoutMs/1000) + 's',
+                        width: video.videoWidth || 0,
+                        height: video.videoHeight || 0,
+                        currentTime: video.currentTime || 0
+                    });
+                }, timeoutMs);
+            });
+        };
+    </script>
+</body>
+</html>

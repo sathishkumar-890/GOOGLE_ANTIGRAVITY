@@ -1,0 +1,1352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nexus IPTV & Live Streams (YouTube Style)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <style>
+:root {
+  --bg-main: #0a0e17;
+  --bg-card: rgba(18, 24, 38, 0.75);
+  --bg-card-hover: rgba(28, 38, 58, 0.9);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-main: #f3f4f6;
+  --text-muted: #9ca3af;
+  --accent-primary: #3b82f6;
+  --accent-red: #ef4444;
+  --accent-glow: rgba(59, 130, 246, 0.35);
+  --danger: #ef4444;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: radial-gradient(circle at 20% 20%, #111827 0%, #07090e 100%);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+/* Top Navbar */
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 2rem;
+  background: rgba(10, 14, 23, 0.85);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border-color);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.brand-badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #ef4444, #f97316);
+  color: #fff;
+  padding: 0.2rem 0.5rem;
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.nav-search {
+  position: relative;
+  width: 320px;
+}
+.nav-search input {
+  width: 100%;
+  padding: 0.6rem 1rem 0.6rem 2.4rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  border-radius: 9999px;
+  color: #fff;
+  font-size: 0.85rem;
+  outline: none;
+  transition: all 0.2s ease;
+}
+.nav-search input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--accent-red);
+  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.35);
+}
+.nav-search svg {
+  position: absolute;
+  left: 0.85rem;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 16px;
+  height: 16px;
+  fill: var(--text-muted);
+}
+.nav-user-menu {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+}
+.nav-link {
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+.nav-link:hover { color: #fff; }
+.nav-user { font-size: 0.82rem; color: var(--text-muted); }
+
+/* Main Grid Layout */
+.app-container {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+  max-width: 1600px;
+  width: 100%;
+  margin: 0 auto;
+  flex: 1;
+}
+
+@media (max-width: 1100px) {
+  .app-container { grid-template-columns: 1fr; }
+}
+
+/* Left Column: Player & Studio */
+.player-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* -------------------------------------------------------------
+   YOUTUBE-STYLE VIDEO VIEWPORT & CUSTOM CONTROLS
+------------------------------------------------------------- */
+.video-viewport {
+  position: relative;
+  background: #000;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+video {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background: #000;
+  display: block;
+}
+
+/* YouTube Big Center Play/Pause Ripple Button */
+.yt-center-action {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s, transform 0.3s;
+  z-index: 20;
+}
+.yt-center-btn {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.75);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+}
+.yt-center-icon {
+  width: 36px;
+  height: 36px;
+  fill: #fff;
+}
+.yt-center-action.show-briefly {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+/* Recording Badge Overlay */
+.rec-overlay {
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+  display: none;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(8px);
+  padding: 0.4rem 0.85rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(239, 68, 68, 0.5);
+  z-index: 30;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #fff;
+}
+.rec-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--danger);
+  box-shadow: 0 0 10px var(--danger);
+  animation: pulse 1s infinite alternate;
+}
+@keyframes pulse {
+  from { opacity: 0.3; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1.1); }
+}
+
+/* YouTube Bottom Control Bar Wrapper */
+.yt-controls-wrapper {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.95) 0%, rgba(0, 0, 0, 0.6) 60%, transparent 100%);
+  padding: 0 1rem 0.75rem 1rem;
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  transition: opacity 0.25s ease;
+  opacity: 1;
+}
+
+/* Auto-hide controls when playing & idle */
+.video-viewport.yt-idle .yt-controls-wrapper {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Red Scrubber / Progress Line */
+.yt-progress-track {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 2px;
+  position: relative;
+  overflow: hidden;
+}
+.yt-progress-line {
+  height: 100%;
+  width: 100%;
+  background: var(--accent-red);
+  box-shadow: 0 0 8px var(--accent-red);
+}
+
+.yt-controls-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.yt-controls-left, .yt-controls-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.yt-btn {
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  padding: 0.4rem;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+  outline: none;
+}
+.yt-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+  transform: scale(1.08);
+}
+.yt-icon {
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+}
+
+/* Volume Group */
+.yt-volume-group {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+}
+.yt-volume-range {
+  width: 60px;
+  height: 4px;
+  accent-color: #fff;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s, width 0.2s;
+}
+.yt-volume-range:hover { opacity: 1; width: 75px; }
+
+/* Live Pill Indicator */
+.yt-live-pill {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #fff;
+  background: rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  letter-spacing: 0.06em;
+  margin-left: 0.4rem;
+}
+.yt-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent-red);
+  box-shadow: 0 0 6px var(--accent-red);
+}
+
+/* Resolution / Quality Button & Popover */
+.yt-quality-container {
+  position: relative;
+}
+.yt-quality-btn {
+  border-radius: 0.4rem !important;
+  padding: 0.3rem 0.6rem !important;
+  gap: 0.35rem;
+  font-weight: 700;
+  font-size: 0.75rem;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+.yt-quality-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.yt-quality-text {
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+
+/* Quality Menu Dropdown (Pop up upwards) */
+.yt-quality-dropdown {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  background: rgba(18, 24, 38, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  min-width: 170px;
+  padding: 0.5rem 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  display: none;
+  flex-direction: column;
+  z-index: 50;
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-quality-dropdown.show { display: flex; }
+@keyframes popIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.yt-quality-title {
+  padding: 0.4rem 1rem 0.5rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.3rem;
+}
+.yt-quality-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.yt-quality-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.yt-quality-item.active {
+  color: var(--accent-red);
+  font-weight: 700;
+}
+.yt-check {
+  font-size: 0.85rem;
+  width: 16px;
+  text-align: center;
+  visibility: hidden;
+}
+.yt-quality-item.active .yt-check { visibility: visible; }
+
+/* -------------------------------------------------------------
+   STREAM HEADER & STUDIO TOOLS
+------------------------------------------------------------- */
+.stream-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 0.85rem;
+  padding: 1rem 1.25rem;
+  backdrop-filter: blur(12px);
+}
+.current-channel-info {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.channel-logo-display {
+  width: 44px;
+  height: 44px;
+  border-radius: 0.6rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 1.1rem;
+  color: var(--accent-red);
+}
+.channel-meta h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.channel-meta p {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  font-family: monospace;
+  margin-top: 0.2rem;
+  max-width: 450px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.studio-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.55rem 1rem;
+  border-radius: 0.6rem;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.btn-record {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.35);
+  color: #f87171;
+}
+.btn-record:hover {
+  background: var(--danger);
+  color: #fff;
+  box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+}
+.btn-record.recording {
+  background: var(--danger);
+  color: #fff;
+  animation: pulse 1s infinite alternate;
+}
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: var(--border-color);
+  color: var(--text-main);
+}
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* -------------------------------------------------------------
+   RIGHT SIDEBAR: CHANNELS & CATEGORIES
+------------------------------------------------------------- */
+.sidebar-panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 1rem;
+  padding: 1.25rem;
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-height: calc(100vh - 120px);
+}
+
+.category-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  flex-shrink: 0;
+  width: 100%;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+}
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.42rem 0.85rem;
+  border-radius: 9999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid var(--border-color);
+  color: #cbd5e1;
+  transition: all 0.2s ease;
+  user-select: none;
+}
+.pill:hover {
+  background: rgba(255, 255, 255, 0.15);
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+.pill.active {
+  background: var(--accent-red);
+  color: #fff;
+  border-color: var(--accent-red);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.4);
+}
+
+.channels-scroll-list {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 0.65rem;
+  overflow-y: auto;
+  padding-right: 0.3rem;
+}
+.channels-scroll-list::-webkit-scrollbar { width: 5px; }
+.channels-scroll-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+}
+
+.channel-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 0.85rem 0.5rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+}
+.channel-card:hover {
+  background: var(--bg-card-hover);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+}
+.channel-card.active {
+  background: rgba(239, 68, 68, 0.12);
+  border-color: var(--accent-red);
+  box-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+}
+.channel-card.active::before {
+  content: '';
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success);
+}
+.channel-card-icon {
+  font-size: 1.6rem;
+  margin-bottom: 0.4rem;
+}
+.channel-card-title {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-main);
+  line-height: 1.2;
+}
+.channel-card-tag {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  margin-top: 0.25rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Toast Container */
+.toast-container {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.toast {
+  background: rgba(17, 24, 39, 0.95);
+  border: 1px solid var(--border-color);
+  backdrop-filter: blur(16px);
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.6rem;
+  font-size: 0.85rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+  </style>
+</head>
+<body>
+
+  <!-- Top Navigation -->
+  <nav class="navbar">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="5 3 19 12 5 21 5 3"></polygon>
+      </svg>
+      <span>NEXUS STREAM</span>
+      <span class="brand-badge">PRO IPTV</span>
+    </div>
+
+    <div class="nav-search">
+      <svg viewBox="0 0 24 24"><path d="M21.71 20.29l-5.4-5.4a8 8 0 1 0-1.42 1.42l5.4 5.4a1 1 0 0 0 1.42-1.42zM10 16a6 6 0 1 1 6-6 6 6 0 0 1-6 6z"/></svg>
+      <input type="text" id="channelSearch" placeholder="Search 30+ channels..." oninput="filterChannels()">
+    </div>
+
+    <div class="nav-user-menu">
+      <span class="nav-user">User: <strong>user</strong></span>
+      <span class="btn btn-secondary" style="font-size: 0.75rem;">Offline Mode</span>
+    </div>
+  </nav>
+
+  <!-- App Layout -->
+  <div class="app-container">
+    
+    <!-- Left Column: Player & Studio -->
+    <div class="player-section">
+      <div class="video-viewport" id="videoViewport">
+        
+        <!-- Live Recording Indicator -->
+        <div id="recOverlay" class="rec-overlay">
+          <div class="rec-dot"></div>
+          <span>REC</span>
+          <span id="recTimer" style="font-family: monospace;">00:00</span>
+        </div>
+
+        <video id="players" playsinline></video>
+
+        <!-- Big Center Play / Pause (YouTube Style) -->
+        <div class="yt-center-action" id="ytCenterAction">
+          <div class="yt-center-btn" id="ytCenterBtn">
+            <svg class="yt-center-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </div>
+        </div>
+
+        <!-- YouTube Style Bottom Control Bar -->
+        <div class="yt-controls-wrapper" id="ytControlsWrapper">
+          <div class="yt-progress-track">
+            <div class="yt-progress-line" id="ytProgressLine"></div>
+          </div>
+
+          <div class="yt-controls-bar">
+            <!-- Left Controls -->
+            <div class="yt-controls-left">
+              <button class="yt-btn" id="ytPlayBtn" title="Play (Space)">
+                <svg class="yt-icon" id="ytPlayIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+              </button>
+
+              <div class="yt-volume-group">
+                <button class="yt-btn" id="ytMuteBtn" title="Mute (M)">
+                  <svg class="yt-icon" id="ytVolIcon" viewBox="0 0 24 24">
+                    <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>
+                  </svg>
+                </button>
+                <input type="range" class="yt-volume-range" id="ytVolRange" min="0" max="1" step="0.05" value="1" title="Volume">
+              </div>
+
+              <div class="yt-live-pill">
+                <span class="yt-live-dot"></span>
+                <span>LIVE</span>
+              </div>
+            </div>
+
+            <!-- Right Controls: Resolution, PiP, Fullscreen -->
+            <div class="yt-controls-right">
+              
+              <!-- Resolution Selector -->
+              <div class="yt-quality-container">
+                <button class="yt-btn yt-quality-btn" id="ytQualityBtn" title="Resolution & Quality">
+                  <svg class="yt-icon" viewBox="0 0 24 24">
+                    <path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58c.18-.14.23-.41.12-.61l-1.92-3.32c-.12-.22-.37-.29-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58c-.18.14-.23.41-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.47-.12-.61l-2.01-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/>
+                  </svg>
+                  <span id="ytQualityText" class="yt-quality-text">AUTO</span>
+                </button>
+
+                <div class="yt-quality-dropdown" id="ytQualityDropdown">
+                  <div class="yt-quality-title">Resolution / Quality</div>
+                  <div class="yt-quality-options" id="ytQualityOptions">
+                    <div class="yt-quality-item active" onclick="setResolution(-1, 'Auto')">
+                      <span class="yt-check">✓</span>
+                      <span>Auto</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- PiP -->
+              <button class="yt-btn" id="ytPipBtn" onclick="togglePiP()" title="Picture in Picture">
+                <svg class="yt-icon" viewBox="0 0 24 24"><path d="M19 7h-8v6h8V7zm2-4H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z"/></svg>
+              </button>
+
+              <!-- Fullscreen -->
+              <button class="yt-btn" id="ytFsBtn" onclick="toggleFullscreen()" title="Fullscreen (F)">
+                <svg class="yt-icon" id="ytFsIcon" viewBox="0 0 24 24"><path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/></svg>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Stream Meta & Studio Control Bar -->
+      <div class="stream-header">
+        <div class="current-channel-info">
+          <div id="channelLogo" class="channel-logo-display">📺</div>
+          <div class="channel-meta">
+            <h3 id="currentChannelName">IBC Tamil</h3>
+            <p id="currentChannelUrl">Loading stream...</p>
+          </div>
+        </div>
+
+        <div class="studio-actions">
+          <button id="btnRecord" class="btn btn-record" onclick="toggleRecording()">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="10"/></svg>
+            <span id="recBtnLabel">Record Stream (MP4)</span>
+          </button>
+          <button class="btn btn-secondary" onclick="takeSnapshot()" title="Capture High-Res Photo">📸 Snapshot</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Sidebar -->
+    <div class="sidebar-panel">
+      <div class="category-pills">
+        <div class="pill active" onclick="filterCategory('all', this)">All</div>
+        <div class="pill" onclick="filterCategory('Entertainment', this)">Entertainment</div>
+        <div class="pill" onclick="filterCategory('News', this)">News</div>
+        <div class="pill" onclick="filterCategory('Movies', this)">Movies</div>
+        <div class="pill" onclick="filterCategory('Music', this)">Music</div>
+        <div class="pill" onclick="filterCategory('Devotional', this)">Devotional</div>
+      </div>
+
+      <div id="channelsGrid" class="channels-scroll-list"></div>
+    </div>
+
+  </div>
+
+  <div id="toastContainer" class="toast-container"></div>
+
+  <script>
+// Nexus Modern IPTV Player & YouTube-Style Controller Engine
+
+const channelData = [
+  { id: "ibctamil", name: "IBC Tamil", cat: "Entertainment", icon: "📡", url: "https://tx1.ibctamil.tv/CDN_IBC_Tamil/index.m3u8" },
+  { id: "ibccan", name: "IBC Canada", cat: "Entertainment", icon: "🍁", url: "https://tx1.ibctamil.tv/CDN_IBC_Canada/index.m3u8" },
+  { id: "ibccom", name: "IBC Comedy", cat: "Entertainment", icon: "🎭", url: "https://tx1.ibctamil.tv/CDN_IBC_Pakidi/index.m3u8" },
+  { id: "vasanth", name: "Vasanth TV", cat: "News", icon: "📺", url: "http://vasanth.live-s.cdn.bitgravity.com/cdn-live/_definst_/vasanth/secure/live/feed01/playlist.m3u8?e=0&h=54e44f64b2e6d5122acdf77d01ab7f9f" },
+  { id: "eet", name: "EET TV", cat: "Entertainment", icon: "⚡", url: "http://live.streamjo.com:1935/eetlive/eettv/playlist.m3u8" },
+  { id: "three_tamil", name: "3 Tamil", cat: "Entertainment", icon: "🎬", url: "https://6n3yogbnd9ok-hls-live.5centscdn.com/threetamil/d0dbe915091d400bd8ee7f27f0791303.sdp/index.m3u8" },
+  { id: "hallmark", name: "Hallmark Movies", cat: "Movies", icon: "⭐", url: "https://dqvu8d0acm4xt.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/HallmarkMovies-prod/playlist.m3u8" },
+  { id: "sphereuk", name: "MovieSphere UK", cat: "Movies", icon: "🇬🇧", url: "https://cdn-ue1-prod.tsv2.amagi.tv/linear/samsunguk-moviesphereuk-samsung-uk/playlist.m3u8" },
+  { id: "sphereus", name: "MovieSphere US", cat: "Movies", icon: "🇺🇸", url: "https://cdn-ue1-prod.tsv2.amagi.tv/linear/samsungus-moviesphere-samsung-samsungus/playlist.m3u8" },
+  { id: "mksix", name: "MK Six", cat: "Entertainment", icon: "🍿", url: "http://103.199.160.85/Content/mktv6/Live/Channel(MKTV6)/index.m3u8" },
+  { id: "mktv", name: "MK TV", cat: "Entertainment", icon: "📺", url: "http://103.199.160.85/Content/mktv/Live/Channel(MKTV)/index.m3u8" },
+  { id: "mktunes", name: "MK Tunes", cat: "Music", icon: "🎵", url: "http://103.199.160.85/Content/mktunes/Live/Channel(MKTunes)/Stream(02)/index.m3u8" },
+  { id: "sirippoli", name: "Sirippoli", cat: "Entertainment", icon: "😄", url: "http://103.199.161.254:80/Content/kalaignarsirippoli/Live/Channel(Kalaignarsirippoli)/index.m3u8" },
+  { id: "murasu", name: "Kalaignar Murasu", cat: "News", icon: "📰", url: "http://103.199.160.85:80/Content/kalaignarmurasu/Live/Channel(KalaignarMurasu)/Stream(02)/index.m3u8" },
+  { id: "kalaignar", name: "Kalaignar TV", cat: "Entertainment", icon: "🌟", url: "http://103.199.161.254/Content/kalaignartv/Live/Channel(KalaignarTV)/stream(02)/index.m3u8" },
+  { id: "pudhuyugam", name: "Pudhuyugam TV", cat: "Entertainment", icon: "🕊️", url: "http://103.199.160.85/Content/puthuyugam/Live/Channel(Puthuyugam)/stream(02)/index.m3u8" },
+  { id: "krishna", name: "Sri Krishna TV", cat: "Devotional", icon: "🪷", url: "http://bsk.livebox.co.in/srikrishnatverdhls/srikrishnatverd.m3u8" },
+  { id: "ragam", name: "Ragam TV", cat: "Music", icon: "🎶", url: "http://account12.livebox.co.in/ntvhls/ntv.m3u8" },
+  { id: "jsptv", name: "JSP TV", cat: "Entertainment", icon: "✨", url: "http://7starcloud.com:1935/jsptv/jsptv/playlist.m3u8" },
+  { id: "agaram_tv", name: "Agaram TV", cat: "Entertainment", icon: "📽️", url: "http://akaram.zecast.net/akaram-live/akaramnew2/index.m3u8" },
+  { id: "agaram_mix", name: "Agaram Mix", cat: "Music", icon: "🎧", url: "http://akaram.zecast.net/akaram-live/akarammix1/index.m3u8" },
+  { id: "comedy", name: "Akaram Galatta", cat: "Entertainment", icon: "🎭", url: "http://akaram.zecast.net/akaram-live/ngrp:akaramgalatta1_all/index.m3u8" },
+  { id: "discovery_tamil", name: "Discovery Tamil", cat: "Entertainment", icon: "🌍", url: "https://streamidvo.multitvsolution.in/live/DiscoveryTamil-a/p4.m3u8" },
+  { id: "vadhanam_tv", name: "Vadhanam TV", cat: "Entertainment", icon: "📺", url: "http://95.216.167.183:5080/LiveApp/streams/443106610169904881506470.m3u8" },
+  { id: "suriya_tv", name: "Suriya TV", cat: "Entertainment", icon: "☀️", url: "http://account16.livebox.co.in/suriyatvcglhls/live.m3u8" },
+  { id: "jcv_tv", name: "JCV TV", cat: "Entertainment", icon: "📡", url: "http://account27.livebox.co.in/jcvtvhls/live.m3u8" },
+  { id: "vidiyal_tv", name: "Vidiyal TV", cat: "News", icon: "🌅", url: "http://account7.livebox.co.in/vidiyaltvhls/live.m3u8" },
+  { id: "aara_tv", name: "Aara TV", cat: "Entertainment", icon: "💫", url: "http://arratv.livebox.co.in/arratvhls/admin.m3u8" },
+  { id: "aasai_tv", name: "Aasai TV", cat: "Entertainment", icon: "❤️", url: "http://osaitv.livebox.co.in/osaihls/live.m3u8" },
+  { id: "bama_tv", name: "Bama TV HD", cat: "Entertainment", icon: "👑", url: "http://livematrix.in:1935/bamahd/bamahd/playlist.m3u8" },
+  { id: "anbu_tv", name: "Anbu TV", cat: "Entertainment", icon: "🤝", url: "http://livestream.5centscdn.com/cinthamani/159b134a543fa8f70b3e0eff376e820c.sdp/index.m3u8" },
+  { id: "csk_tv", name: "CSK TV", cat: "Entertainment", icon: "🦁", url: "http://185.105.4.244:1935/livesp/csktv1/playlist.m3u8" }
+];
+
+let currentHls = null;
+let activeChannel = channelData[0];
+let currentFilter = 'all';
+let currentLevelIndex = -1;
+
+// --- 1. CHANNEL NAVIGATION & SEARCH ---
+function renderChannels(items) {
+  const grid = document.getElementById('channelsGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+  items.forEach(ch => {
+    const card = document.createElement('div');
+    card.className = `channel-card ${ch.id === activeChannel.id ? 'active' : ''}`;
+    card.id = `card-${ch.id}`;
+    card.onclick = () => switchChannel(ch);
+
+    card.innerHTML = `
+      <div class="channel-card-icon">${ch.icon}</div>
+      <div class="channel-card-title">${ch.name}</div>
+      <div class="channel-card-tag">${ch.cat}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+function filterChannels() {
+  const q = document.getElementById('channelSearch').value.toLowerCase().trim();
+  const filtered = channelData.filter(ch => {
+    const matchCat = (currentFilter === 'all' || ch.cat.toLowerCase() === currentFilter.toLowerCase());
+    const matchQuery = ch.name.toLowerCase().includes(q) || ch.cat.toLowerCase().includes(q);
+    return matchCat && matchQuery;
+  });
+  renderChannels(filtered);
+}
+
+function filterCategory(cat, el) {
+  currentFilter = cat;
+  document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  filterChannels();
+}
+
+function switchChannel(channel) {
+  if (isRecording) {
+    showToast('⚠️ Stop recording before changing channels!');
+    return;
+  }
+  activeChannel = channel;
+  document.querySelectorAll('.channel-card').forEach(c => c.classList.remove('active'));
+  const activeEl = document.getElementById(`card-${channel.id}`);
+  if (activeEl) activeEl.classList.add('active');
+
+  document.getElementById('currentChannelName').innerText = channel.name;
+  document.getElementById('currentChannelUrl').innerText = channel.url;
+  document.getElementById('channelLogo').innerText = channel.icon;
+
+  playStream(channel.url);
+  showToast(`Switched to ${channel.name}`);
+}
+
+// --- 2. HLS PLAYBACK & DYNAMIC RESOLUTION ---
+function playStream(url) {
+  const video = document.getElementById('players');
+  if (!video) return;
+
+  if (currentHls) {
+    currentHls.destroy();
+    currentHls = null;
+  }
+
+  // Reset quality options
+  resetQualityMenu();
+
+  if (Hls.isSupported()) {
+    const hls = new Hls({
+      enableWorker: true,
+      lowLatencyMode: true,
+      backBufferLength: 60
+    });
+    currentHls = hls;
+    hls.loadSource(url);
+    hls.attachMedia(video);
+
+    hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
+      populateQualityMenu(data.levels);
+      video.play().then(() => updatePlayIcon(true)).catch(() => updatePlayIcon(false));
+    });
+
+    hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
+      const level = hls.levels[data.level];
+      if (level && currentLevelIndex === -1) {
+        document.getElementById('ytQualityText').innerText = `AUTO (${level.height}p)`;
+      }
+    });
+
+    hls.on(Hls.Events.ERROR, (event, data) => {
+      if (data.fatal) {
+        switch(data.type) {
+          case Hls.ErrorTypes.NETWORK_ERROR:
+            hls.startLoad();
+            break;
+          case Hls.ErrorTypes.MEDIA_ERROR:
+            hls.recoverMediaError();
+            break;
+          default:
+            hls.destroy();
+            break;
+        }
+      }
+    });
+  } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+    video.src = url;
+    video.play();
+    updatePlayIcon(true);
+  }
+}
+
+// --- 3. DYNAMIC RESOLUTION MENU BUILDER ---
+function resetQualityMenu() {
+  const list = document.getElementById('ytQualityOptions');
+  if (!list) return;
+  list.innerHTML = `
+    <div class="yt-quality-item active" onclick="setResolution(-1, 'Auto')">
+      <span class="yt-check">✓</span>
+      <span>Auto</span>
+    </div>
+  `;
+  document.getElementById('ytQualityText').innerText = 'AUTO';
+  currentLevelIndex = -1;
+}
+
+function populateQualityMenu(levels) {
+  const list = document.getElementById('ytQualityOptions');
+  if (!list || !levels || levels.length === 0) return;
+
+  list.innerHTML = `
+    <div class="yt-quality-item ${currentLevelIndex === -1 ? 'active' : ''}" onclick="setResolution(-1, 'Auto')">
+      <span class="yt-check">✓</span>
+      <span>Auto (Multi-bitrate)</span>
+    </div>
+  `;
+
+  // Sort descending by height
+  const sorted = levels.map((lvl, idx) => ({ ...lvl, origIdx: idx }))
+                       .sort((a, b) => (b.height || 0) - (a.height || 0));
+
+  sorted.forEach(lvl => {
+    const height = lvl.height || Math.round((lvl.bitrate || 0) / 1000);
+    const label = height > 700 ? `${height}p HD` : `${height}p`;
+    const item = document.createElement('div');
+    item.className = `yt-quality-item ${currentLevelIndex === lvl.origIdx ? 'active' : ''}`;
+    item.onclick = (e) => {
+      e.stopPropagation();
+      setResolution(lvl.origIdx, label);
+    };
+    item.innerHTML = `
+      <span class="yt-check">✓</span>
+      <span>${label}</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function setResolution(levelIndex, label) {
+  if (!currentHls) return;
+  currentHls.currentLevel = levelIndex;
+  currentLevelIndex = levelIndex;
+
+  document.getElementById('ytQualityText').innerText = label.toUpperCase();
+
+  // Update active checkmarks
+  const items = document.querySelectorAll('.yt-quality-item');
+  items.forEach(it => it.classList.remove('active'));
+  if (event && event.currentTarget) {
+    event.currentTarget.classList.add('active');
+  }
+
+  toggleQualityDropdown(false);
+  showToast(`📺 Resolution switched to: ${label}`);
+}
+
+function toggleQualityDropdown(forceState) {
+  const dropdown = document.getElementById('ytQualityDropdown');
+  if (!dropdown) return;
+  const isShow = forceState !== undefined ? forceState : !dropdown.classList.contains('show');
+  if (isShow) dropdown.classList.add('show');
+  else dropdown.classList.remove('show');
+}
+
+// --- 4. YOUTUBE PLAYER CONTROLS (PLAY, VOLUME, FULLSCREEN, PiP) ---
+function togglePlayPause() {
+  const video = document.getElementById('players');
+  if (!video) return;
+  if (video.paused) {
+    video.play();
+    updatePlayIcon(true);
+    triggerCenterAnimation(true);
+  } else {
+    video.pause();
+    updatePlayIcon(false);
+    triggerCenterAnimation(false);
+  }
+}
+
+function updatePlayIcon(isPlaying) {
+  const icon = document.getElementById('ytPlayIcon');
+  if (!icon) return;
+  if (isPlaying) {
+    icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>'; // Pause icon
+  } else {
+    icon.innerHTML = '<path d="M8 5v14l11-7z"/>'; // Play icon
+  }
+}
+
+function triggerCenterAnimation(isPlaying) {
+  const wrap = document.getElementById('ytCenterAction');
+  const btn = document.getElementById('ytCenterBtn');
+  if (!wrap || !btn) return;
+  const icon = btn.querySelector('svg');
+  if (isPlaying) {
+    icon.innerHTML = '<path d="M8 5v14l11-7z"/>';
+  } else {
+    icon.innerHTML = '<path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>';
+  }
+  wrap.classList.add('show-briefly');
+  setTimeout(() => wrap.classList.remove('show-briefly'), 500);
+}
+
+function setVolume(val) {
+  const video = document.getElementById('players');
+  if (!video) return;
+  video.volume = val;
+  video.muted = (val === 0);
+  updateVolumeIcon(video.muted ? 0 : val);
+}
+
+function toggleMute() {
+  const video = document.getElementById('players');
+  if (!video) return;
+  video.muted = !video.muted;
+  const slider = document.getElementById('ytVolRange');
+  if (video.muted) {
+    slider.value = 0;
+    updateVolumeIcon(0);
+  } else {
+    slider.value = video.volume || 1;
+    updateVolumeIcon(video.volume || 1);
+  }
+}
+
+function updateVolumeIcon(vol) {
+  const icon = document.getElementById('ytVolIcon');
+  if (!icon) return;
+  if (vol === 0) {
+    icon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+  } else if (vol < 0.5) {
+    icon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/>';
+  } else {
+    icon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+  }
+}
+
+function togglePiP() {
+  const video = document.getElementById('players');
+  if (document.pictureInPictureElement) document.exitPictureInPicture();
+  else if (document.pictureInPictureEnabled) video.requestPictureInPicture();
+}
+
+function toggleFullscreen() {
+  const vp = document.getElementById('videoViewport');
+  const icon = document.getElementById('ytFsIcon');
+  if (!document.fullscreenElement) {
+    vp.requestFullscreen().catch(err => alert(err.message));
+    if (icon) icon.innerHTML = '<path d="M5 16h3v3h2v-5H5v2zm3-8H5v2h5V5H8v3zm6 11h2v-3h3v-2h-5v5zm2-11V5h-2v5h5V8h-3z"/>'; // exit fs icon
+  } else {
+    document.exitFullscreen();
+    if (icon) icon.innerHTML = '<path d="M7 14H5v5h5v-2H7v-3zm-2-4h2V7h3V5H5v5zm12 7h-3v2h5v-5h-2v3zM14 5v2h3v3h2V5h-5z"/>'; // enter fs icon
+  }
+}
+
+// Auto-hide controls timer
+let idleTimeout = null;
+function handleUserActivity() {
+  const vp = document.getElementById('videoViewport');
+  if (!vp) return;
+  vp.classList.remove('yt-idle');
+  clearTimeout(idleTimeout);
+  idleTimeout = setTimeout(() => {
+    const video = document.getElementById('players');
+    if (video && !video.paused) {
+      vp.classList.add('yt-idle');
+      toggleQualityDropdown(false);
+    }
+  }, 3500);
+}
+
+// --- 5. STREAM RECORDER (SAVE MP4/WEBM LOCALLY) ---
+let mediaRecorder = null;
+let recordedChunks = [];
+let isRecording = false;
+let recordStartTime = null;
+let recordInterval = null;
+
+function getSupportedMimeType() {
+  const types = [
+    'video/mp4;codecs=avc1,mp4a.40.2',
+    'video/mp4',
+    'video/webm;codecs=vp9,opus',
+    'video/webm;codecs=vp8,opus',
+    'video/webm'
+  ];
+  for (const t of types) {
+    if (MediaRecorder.isTypeSupported(t)) return t;
+  }
+  return '';
+}
+
+function toggleRecording() {
+  if (!isRecording) startRecording();
+  else stopRecording();
+}
+
+function startRecording() {
+  const video = document.getElementById('players');
+  const stream = video.captureStream ? video.captureStream() : (video.mozCaptureStream ? video.mozCaptureStream() : null);
+
+  if (!stream) {
+    showToast('❌ Browser does not support stream capture.');
+    return;
+  }
+
+  const mimeType = getSupportedMimeType();
+  recordedChunks = [];
+
+  try {
+    mediaRecorder = new MediaRecorder(stream, mimeType ? { mimeType } : undefined);
+  } catch (err) {
+    showToast('❌ MediaRecorder error: ' + err.message);
+    return;
+  }
+
+  mediaRecorder.ondataavailable = (e) => {
+    if (e.data && e.data.size > 0) recordedChunks.push(e.data);
+  };
+
+  mediaRecorder.onstop = saveRecordedFile;
+  mediaRecorder.start(1000);
+  isRecording = true;
+  recordStartTime = Date.now();
+
+  const btn = document.getElementById('btnRecord');
+  btn.classList.add('recording');
+  document.getElementById('recBtnLabel').innerText = 'Stop & Save Video';
+  document.getElementById('recOverlay').style.display = 'flex';
+
+  recordInterval = setInterval(updateRecTimer, 500);
+  showToast('⏺️ Recording started...');
+}
+
+function updateRecTimer() {
+  const diff = Math.floor((Date.now() - recordStartTime) / 1000);
+  const mins = String(Math.floor(diff / 60)).padStart(2, '0');
+  const secs = String(diff % 60).padStart(2, '0');
+  document.getElementById('recTimer').innerText = `${mins}:${secs}`;
+}
+
+function stopRecording() {
+  if (!mediaRecorder || mediaRecorder.state === 'inactive') return;
+  mediaRecorder.stop();
+  isRecording = false;
+  clearInterval(recordInterval);
+
+  const btn = document.getElementById('btnRecord');
+  btn.classList.remove('recording');
+  document.getElementById('recBtnLabel').innerText = 'Record Stream (MP4)';
+  document.getElementById('recOverlay').style.display = 'none';
+  document.getElementById('recTimer').innerText = '00:00';
+}
+
+function saveRecordedFile() {
+  const mimeType = mediaRecorder.mimeType || 'video/mp4';
+  const isMp4 = mimeType.includes('mp4');
+  const ext = isMp4 ? 'mp4' : 'webm';
+  const blob = new Blob(recordedChunks, { type: mimeType });
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  const timeStr = new Date().toISOString().replace(/[:.]/g, '-');
+  a.href = url;
+  a.download = `${activeChannel.name.replace(/\s+/g, '_')}_Record_${timeStr}.${ext}`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 2000);
+
+  showToast(`✅ Saved ${a.download} (${(blob.size / (1024 * 1024)).toFixed(2)} MB) to your PC!`);
+}
+
+function takeSnapshot() {
+  const video = document.getElementById('players');
+  if (!video.videoWidth || !video.videoHeight) {
+    showToast('⚠️ No active video frame to capture.');
+    return;
+  }
+  const canvas = document.createElement('canvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+  const a = document.createElement('a');
+  const timeStr = new Date().toISOString().replace(/[:.]/g, '-');
+  a.href = canvas.toDataURL('image/png');
+  a.download = `${activeChannel.name.replace(/\s+/g, '_')}_Snapshot_${timeStr}.png`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+
+  showToast(`📸 Snapshot saved: ${a.download}`);
+}
+
+function showToast(msg) {
+  const tc = document.getElementById('toastContainer');
+  if (!tc) return;
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.innerHTML = msg;
+  tc.appendChild(t);
+  setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateY(10px)';
+    t.style.transition = 'all 0.3s';
+    setTimeout(() => tc.removeChild(t), 300);
+  }, 3500);
+}
+
+// Global Shortcuts & Events Setup
+window.addEventListener('DOMContentLoaded', () => {
+  renderChannels(channelData);
+  switchChannel(channelData[0]);
+
+  const vp = document.getElementById('videoViewport');
+  const video = document.getElementById('players');
+  const playBtn = document.getElementById('ytPlayBtn');
+  const muteBtn = document.getElementById('ytMuteBtn');
+  const volRange = document.getElementById('ytVolRange');
+  const qualityBtn = document.getElementById('ytQualityBtn');
+
+  if (playBtn) playBtn.onclick = (e) => { e.stopPropagation(); togglePlayPause(); };
+  if (muteBtn) muteBtn.onclick = (e) => { e.stopPropagation(); toggleMute(); };
+  if (volRange) volRange.oninput = (e) => { e.stopPropagation(); setVolume(parseFloat(e.target.value)); };
+  if (qualityBtn) qualityBtn.onclick = (e) => { e.stopPropagation(); toggleQualityDropdown(); };
+
+  // Click video viewport to play/pause
+  if (vp) {
+    vp.onclick = (e) => {
+      // Don't toggle if clicking inside controls or quality menu
+      if (e.target.closest('.yt-controls-wrapper')) return;
+      togglePlayPause();
+    };
+    vp.ondblclick = (e) => {
+      if (e.target.closest('.yt-controls-wrapper')) return;
+      toggleFullscreen();
+    };
+    vp.onmousemove = handleUserActivity;
+    vp.onmouseleave = () => {
+      if (video && !video.paused) vp.classList.add('yt-idle');
+    };
+  }
+
+  // Close quality dropdown when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!e.target.closest('.yt-quality-container')) {
+      toggleQualityDropdown(false);
+    }
+  });
+
+  // Keyboard Shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT') return;
+    if (e.code === 'Space') {
+      e.preventDefault();
+      togglePlayPause();
+    } else if (e.code === 'KeyF') {
+      e.preventDefault();
+      toggleFullscreen();
+    } else if (e.code === 'KeyM') {
+      e.preventDefault();
+      toggleMute();
+    } else if (e.code === 'KeyR') {
+      e.preventDefault();
+      toggleRecording();
+    } else if (e.code === 'KeyS') {
+      e.preventDefault();
+      takeSnapshot();
+    }
+  });
+});
+
+  </script>
+</body>
+</html>
