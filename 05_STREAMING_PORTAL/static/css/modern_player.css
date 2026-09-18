@@ -504,6 +504,42 @@ video {
   transform: translateY(-1px);
   box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
 }
+.btn-vlc-action {
+  background: linear-gradient(135deg, #f97316 0%, #ea580c 100%);
+  color: #fff;
+}
+.btn-vlc-action:hover {
+  background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.4);
+}
+.btn-cast-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+  color: #fff;
+  border: none;
+  border-radius: 0.6rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+.btn-cast-action:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+}
+.yt-btn.casting-active {
+  color: #38bdf8;
+  filter: drop-shadow(0 0 6px rgba(56, 189, 248, 0.7));
+  animation: pulse-cast 2s infinite ease-in-out;
+}
+@keyframes pulse-cast {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.75; transform: scale(1.1); }
+}
 .btn-dismiss-helper {
   background: rgba(255, 255, 255, 0.08);
   color: #94a3b8;

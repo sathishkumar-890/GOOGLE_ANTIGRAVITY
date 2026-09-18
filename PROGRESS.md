@@ -38,7 +38,14 @@
     - Populated Column 6 (`Function Description` in `MAIN VDC_REWARD` and `FUNCTION DESCRIPTION` in `Reward (2)`) across all 278 rows.
     - Verified 0 missing, 0 empty cells, and 100% valid function strings strictly belonging to the REWARD FUN taxonomy (e.g. `MEASUREMENT INSTRUMENTS` for Loading Computer, `HEAT EXCHANGER` for coolers, `AIR CONDITION` for AC plants, `SCRUBBER SYSTEM` for EGCS, `ELEVATOR` for crew elevator, `ELECTRONIC EQ.` for shaft earthing and CCTV, `FIRE DETECTION & ALARM SYSTEM` for ERAMS and signal light columns, `NAVIGATION EQUIPMENT` for marine radars & auto pilot).
     - Preserved all other 15 columns in `MAIN VDC_REWARD` and all formulas in `Reward (2)` 100% intact and untouched.
-    - Full integrity verification passed (`verify_reward_vdc_integrity.py`). Backup saved to `VL_EXTRACTION_I.REWARD_MAIN VDC_BACKUP.xlsx`.
+  - **Maker Code Population for Wisdom (`VL_EXTRACTION_I.wisdm_mak.xlsx`)**:
+    - Extracted all 194 maker definitions from Columns J & K (`Code` and `Description`) of sheet `Req Lib`.
+    - Cross-referenced all 76 unique makers across the 277 equipment rows in `MAIN VDC_wisdom` (Column H / Col 8 `Maker` to Column I / Col 9 `Maker Code`).
+    - Handled abbreviations, known maritime maker mappings, and typo variations with 100% certainty (e.g. `JRC` -> `M1367` JAPAN RADIO CO., LTD, `BOLL&KIRCH FILTERBAU GMBH` -> `M0351`, `TAIKO` -> `M0337`, `FLUTEK` -> `M1727`, `KOCKUM SONICS AB` -> `M0605`, `LEROY SOMER` -> `m0015`, `HI AIR KOREA` / `HI-AIR KOREA` -> `O1498`, etc.).
+    - Populated 193 rows with valid `Req Lib` maker codes.
+    - Kept 84 rows strictly blank/empty (`None`) where maker was not present in `Req Lib` or identity could not be matched with 100% certainty (0 assumptions).
+    - Preserved all other 17 columns in `MAIN VDC_wisdom` and all other sheets 100% intact.
+    - Verified 100% integrity pass via `verify_wisdom_maker_codes_integrity.py`. Backup saved to `VL_EXTRACTION_I.wisdm_mak_BACKUP.xlsx`.
 - **Next Steps**:
   - Proceed with downstream PMS spares extraction or further VDC validation tasks.
 
@@ -179,6 +186,19 @@
      - **Webhook Sync**: Overwrote Primary `IPTV_Playlist` sheet with 81 rows (1 header + 80 channels) with dark header styling and green status fill.
      - **Live Portal Verification**: Tested on `sathishkumar890.pythonanywhere.com` with automated Selenium tests; confirmed 80 channels rendered in playlist, dual-stream tags, and instant video playback on `Roja TV1` (1080p) and `Thanthi Tv` (360p).
      - Saved artifacts: `live_80_channels_merged_standby.png`, `live_roja_tv1_stream_playing.png`, and `live_thanthi_tv_stream_playing.png`.
+   - **Pure Cinema Mode, TV Casting & 1-Click VLC Media Player Launcher**:
+     - **Pure Cinema Mode (Complete Removal of Footer Box)**: Removed `.stream-header` (channel logo, name, and live pill) from below the video player. Left column is exclusively the player with YouTube-style bottom controls; right column is the playlist sidebar.
+     - **TV Casting Engine**:
+       - Embedded Google Cast Web SDK in player header.
+       - Added `#ytCastBtn` on the player control bar right next to the Resolution/Quality button with `.casting-active` cyan pulsing status indicator.
+       - Dual-engine casting support: Google Cast Web SDK (`cast.framework.CastContext`) for Chromecast / Google TV / Android TV + W3C Remote Playback API (`video.remote.prompt()`) for Smart TVs (Samsung Tizen, LG webOS, AirPlay, Miracast).
+     - **1-Click VLC Media Player Integration**:
+       - Diagnosed browser CORS restriction on Sony Pix and related streams (top-level proxy has CORS, but Akamai origin submanifests lack `Access-Control-Allow-Origin: *`).
+       - Integrated automated helper overlay displaying:
+         - `▶ Play in VLC (1-Click)`: Generates and downloads a `.m3u` playlist file and triggers `vlc://` URL protocol handler for immediate VLC playback.
+         - `📺 Cast to TV`: Streams directly to nearby TV screen.
+     - **80 Channels Synced to Google Sheet**: All 80 channels updated to `Live` in Google Sheet and local playlist. 71 channels play directly in browser up to 1080p Full HD; all 80 supported via 1-Click VLC and TV Casting.
+     - **Live Verification on PythonAnywhere**: Deployed and verified via automated Selenium test suite (`live_cast_and_cinema_standby.png`, `live_sony_pix_vlc_cast_overlay.png`, `live_stream_playing_cinema_cast.png`). All tests passed with Status 200.
 
 ---
 

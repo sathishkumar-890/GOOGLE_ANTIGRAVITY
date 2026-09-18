@@ -1,8 +1,8 @@
 # Chat Archive: VL_EXTRACTION
 
 - **Conversation ID**: `5eccb011-a5ef-42b4-8b13-345cb40d9caf`
-- **Last Modified**: 2026-09-18 10:29:51.0431879+00:00
-- **Total Messages**: 122
+- **Last Modified**: 2026-09-18 10:43:13.6060465+00:00
+- **Total Messages**: 128
 
 ---
 
@@ -1916,6 +1916,92 @@ IFE BOAT DAVIT SBRD` | `ORIENTAL PRECISION` | `LIFE BOAT DAVITS` |
 ### 5. Tracking & Documentation
 - [`PROGRESS.md`](file:///c:/Users/User/Documents/antigravity/joyful-turing/PROGRESS.md) has been updated with the completion details.
 - Chat archives exported and synced via `export_chats.py`.
+
+---
+
+### 👤 User:
+i have downloaded one excel file in this directory wisdom_mak file i want to update maker code, where to get maker code same file there is a req lib sheet   check coloumn J and K listed all codes and maker if the name matched get the code and update to vdc_wisdom sheet
+
+### 👤 User:
+i have downloaded one excel file in this directory wisdom_mak file i want to update maker code, where to get maker code same file there is a req lib sheet   check coloumn J and K listed all codes and maker if the name matched get the code and update to vdc_wisdom sheet
+
+### 👤 User:
+i have downloaded one excel file in this directory wisdom_mak file i want to update maker code, where to get maker code same file there is a req lib sheet   check coloumn J and K listed all codes and maker if the name matched get the code and update to vdc_wisdom sheet, some name shorter for exaple japan radio co ltd as jrc if you are sure about the maker name then update otherwise keep empty.
+
+### 🤖 Antigravity Agent:
+I have launched the search to check occurrences of these maker codes across other workbooks in the workspace and am waiting for the output.
+
+---
+
+### 🤖 Antigravity Agent:
+I have launched `update_wisdom_maker_codes.py` to update the Maker Code column in `MAIN VDC_wisdom` and am waiting for the process to complete.
+
+---
+
+### 🤖 Antigravity Agent:
+The **Maker Code** update for **`MAIN VDC_wisdom`** in [`VL_EXTRACTION_I.wisdm_mak.xlsx`](file:///c:/Users/User/Documents/antigravity/joyful-turing/01_VL_EXTRACTION/VL_EXTRACTION_I.wisdm_mak.xlsx) has been completed and verified.
+
+---
+
+### Key Summary of Changes
+
+1. **Source & Reference Matching**:
+   - Extracted all **194 valid maker codes and descriptions** from sheet `Req Lib` (Columns J & K, rows 3 to 197).
+   - Audited all 76 unique equipment makers across 277 rows in `MAIN VDC_wisdom` (Column H / Col 8 `Maker` $\rightarrow$ Column I / Col 9 `Maker Code`).
+   - Handled abbreviations, company acronyms, and catalog spelling variations with 100% confidence:
+     - `JRC` $\rightarrow$ **`M1367`** (`JAPAN RADIO CO., LTD`) *(Explicit user example)*
+     - `BOLL&KIRCH FILTERBAU GMBH` $\rightarrow$ **`M0351`** (`BOLL & KIRCH FILTERBAN  GMBH`)
+     - `TAIKO` $\rightarrow$ **`M0337`** (`TAIKO KIKAI INDUSTRIES CO. LTD.`)
+     - `FLUTEK` $\rightarrow$ **`M1727`** (`FLUTEK, LTD`)
+     - `KOCKUM SONICS AB` $\rightarrow$ **`M0605`** (`KOCKUM SONICS AB`)
+     - `LEROY SOMER` $\rightarrow$ **`m0015`** (`LEROY SOMER`)
+     - `HI AIR KOREA` / `HI-AIR KOREA` $\rightarrow$ **`O1498`** (`HI AIR KOREA`)
+     - `DONGHWA ENTEC` $\rightarrow$ **`M0202`** (`DONGHWA ENTEC`)
+     - `KONGSBERG` / `KONGSBERG MARITIME AS` $\rightarrow$ **`M0249`** (`KONGSBERG`)
+     - `GEA` $\rightarrow$ **`M0237`** (`GEA WESTFALIA SEPARATOR`)
+     - `MYTEC` $\rightarrow$ **`T1189`** (`MYTEC CO., LTD`)
+     - `HMMCO` $\rightarrow$ **`M0230`** (`Hyundai Marine Machinery Co., Ltd.`)
+     - `SAMKUN CENTRY` / `SAMKUN CENTURY` $\rightarrow$ **`O0953`** (`SAMKUN CENTURY CO.,LTD (KOREA)`)
+     - `AUTRONICA` $\rightarrow$ **`M1631`** (`AUTRONICA FIRE AND SECURITY AS (NORWAY)`)
+     - `DAEYANG ELECTRIC` $\rightarrow$ **`M1087`** (`DAEYANG ELECTRIC CO., LTD`)
+     - `HANLA IMS` $\rightarrow$ **`M1774`** (`HANLA IMS CO., LTD`)
+     - `JOTRON` $\rightarrow$ **`M1712`** (`JOTRON AS`)
+     - `ORIENTAL` $\rightarrow$ **`M1164`** (`ORIENTAL PRECISION & ENGINEERING CO.LTD`
+<truncated 687 bytes>
+`YDK TECH.`, `MRC`, etc.), Column 9 is kept strictly **empty**.
+
+---
+
+### Verification & Integrity Checks
+
+Ran comprehensive validation script [`verify_wisdom_maker_codes_integrity.py`](file:///c:/Users/User/Documents/antigravity/joyful-turing/01_VL_EXTRACTION/verify_wisdom_maker_codes_integrity.py):
+- **Populated rows**: **193 rows** with valid `Req Lib` codes.
+- **Empty rows**: **84 rows** kept blank where maker is not in `Req Lib`.
+- **Invalid codes**: **0**.
+- **Other 17 columns in `MAIN VDC_wisdom`**: **100% identical** and untouched.
+- **Other sheets in workbook**: **100% untouched**.
+- **Backup**: Saved to [`VL_EXTRACTION_I.wisdm_mak_BACKUP.xlsx`](file:///c:/Users/User/Documents/antigravity/joyful-turing/01_VL_EXTRACTION/VL_EXTRACTION_I.wisdm_mak_BACKUP.xlsx).
+
+---
+
+### Sample Verified Rows in `MAIN VDC_wisdom`
+
+| Row | Code | Machinery Name | Maker | Maker Code | Status |
+|:---:|:---|:---|:---|:---:|:---|
+| **2** | `LCMP` | LOADING COMPUTER | `TECHMARINE` | *Empty* | Not in `Req Lib` |
+| **4** | `SGR1` | STEERING GEAR | `KONGSBERG` | **`M0249`** | Matched |
+| **8** | `YMRWC1` | MOORING WINCH NO.1 | `FLUTEK` | **`M1727`** | Matched |
+| **14** | `BOWTHRU` | BOW THRUSTER | `KAWASAKI HEAVY INDUSTRIES` | *Empty* | Not in `Req Lib` |
+| **30** | `VBSSF` | BOSUN STORE SUPP.FAN | `HI-AIR KOREA` | **`O1498`** | Matched |
+| **99** | `ME` | MAIN ENGINE | `HHI-EMD` | *Empty* | Not in `Req Lib` |
+| **120** | `MELOPUR2`| M/E L.O. PURIFIER NO.2 | `GEA` | **`M0237`** | Matched |
+| **131** | `WORKCOMP`| WORKING AIR COMPRESSOR | `DONGHWA ENTEC` | **`M0202`** | Matched |
+| **136** | `HTFWCOOL`| H.T.F.W. COOLER | `MYTEC` | **`T1189`** | Matched |
+| **180** | `HTCFWP2` | H.T.C.F.W. PUMP NO.2 | `TAIKO` | **`M0337`** | Matched |
+| **218** | `ELECHEAT`| ELECTRIC HEATER | `SAMKUN CENTRY` | **`O0953`** | Matched |
+| **236** | `ECDIS1` | ECDIS NO.1 | `JRC` | **`M1367`** | Matched |
+| **239** | `NARADX` | MARINE RADAR X-BAND | `JRC` | **`M1367`** | Matched |
+| **261** | `GC` | GYRO COMPASS | `YDK TECH.` | *Empty* | Not in `Req Lib` |
 
 ---
 

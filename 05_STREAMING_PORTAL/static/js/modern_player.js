@@ -409,31 +409,36 @@ function playStream(url) {
     });
 
     hls.on(Hls.Events.ERROR, (event, data) => {
+      console.warn('[HLS Error]', data.type, data.details, data.fatal);
       if (data.fatal) {
         switch(data.type) {
           case Hls.ErrorTypes.NETWORK_ERROR:
-            if (activeChannel && activeChannel.url && activeChannel.url.startsWith('http://') && window.location.protocol === 'https:') {
+            if (activeChannel) {
               showHttpHelper(activeChannel);
-            } else {
-              hls.startLoad();
             }
+            hls.destroy();
             break;
           case Hls.ErrorTypes.MEDIA_ERROR:
             hls.recoverMediaError();
             break;
           default:
-            if (activeChannel && activeChannel.url && activeChannel.url.startsWith('http://') && window.location.protocol === 'https:') {
+            if (activeChannel) {
               showHttpHelper(activeChannel);
             }
             hls.destroy();
             break;
         }
+      } else if (data.details === 'levelLoadError' || data.details === 'manifestLoadError' || data.details === 'keyLoadError') {
+        if (activeChannel) {
+          showHttpHelper(activeChannel);
+        }
+        hls.destroy();
       }
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = url;
     video.onerror = () => {
-      if (activeChannel && activeChannel.url && activeChannel.url.startsWith('http://') && window.location.protocol === 'https:') {
+      if (activeChannel) {
         showHttpHelper(activeChannel);
       }
     };
@@ -618,11 +623,185 @@ function handleUserActivity() {
   }, 3500);
 }
 
-// --- 4. HTTP STREAM HELPER & UTILITIES ---
+// --- 4. GOOGLE CAST, VLC LAUNCHER & STREAM HELPER ---
+
+let castSession = null;
+
+// Initialize Google Cast Web SDK
+window['__onGCastApiAvailable'] = function(isAvailable) {
+  if (isAvailable && window.cast && window.cast.framework) {
+    try {
+      cast.framework.CastContext.getInstance().setOptions({
+        receiverApplicationId: chrome.cast.media.DEFAULT_MEDIA_RECEIVER_APP_ID,
+        autoJoinPolicy: chrome.cast.AutoJoinPolicy.ORIGIN_SCOPED
+      });
+      console.log('[Cast SDK] Google Cast framework initialized successfully.');
+
+      const castContext = cast.framework.CastContext.getInstance();
+      castContext.addEventListener(
+        cast.framework.CastContextEventType.CAST_STATE_CHANGED,
+        (event) => {
+          const castBtn = document.getElementById('ytCastBtn');
+          if (!castBtn) return;
+          if (event.castState === cast.framework.CastState.CONNECTED) {
+            castBtn.classList.add('casting-active');
+            castSession = castContext.getCurrentSession();
+            showToast('📺 Connected to TV Screen (Casting Active)');
+          } else if (event.castState === cast.framework.CastState.NOT_CONNECTED) {
+            castBtn.classList.remove('casting-active');
+            castSession = null;
+          }
+        }
+      );
+    } catch (e) {
+      console.warn('[Cast SDK] Initialization error:', e);
+    }
+  }
+};
+
+function castStreamToTv(targetChannel) {
+  const ch = targetChannel || activeChannel;
+  if (!ch || !ch.url) {
+    showToast('⚠️ Please select a channel first to cast.');
+    return;
+  }
+
+  // Strategy 1: Google Cast Web SDK (Chromecast / Google TV / Android TV)
+  if (window.cast && window.cast.framework) {
+    try {
+      const castContext = cast.framework.CastContext.getInstance();
+      const currentSession = castContext.getCurrentSession();
+      if (!currentSession) {
+        showToast('📺 Searching for nearby TV screens...');
+        castContext.requestSession().then(() => {
+          const newSession = castContext.getCurrentSession();
+          if (newSession) {
+            loadMediaOnCast(newSession, ch);
+          }
+        }).catch(err => {
+          console.warn('[Cast SDK] Request session dismissed or failed:', err);
+          fallbackRemotePlayback(ch);
+        });
+      } else {
+        loadMediaOnCast(currentSession, ch);
+      }
+      return;
+    } catch (e) {
+      console.warn('[Cast SDK] Execution error, falling back to Smart TV playback:', e);
+    }
+  }
+
+  // Strategy 2: W3C Remote Playback API fallback for Smart TVs (Samsung Tizen, LG webOS, AirPlay)
+  fallbackRemotePlayback(ch);
+}
+
+function loadMediaOnCast(session, ch) {
+  if (!session || !ch) return;
+  try {
+    const mediaInfo = new chrome.cast.media.MediaInfo(ch.url, 'application/x-mpegurl');
+    mediaInfo.metadata = new chrome.cast.media.GenericMediaMetadata();
+    mediaInfo.metadata.title = ch.name;
+    mediaInfo.metadata.subtitle = 'Nexus IPTV Live Stream';
+    if (ch.icon && ch.icon.startsWith('http')) {
+      mediaInfo.metadata.images = [{ url: ch.icon }];
+    }
+    mediaInfo.streamType = chrome.cast.media.StreamType.LIVE;
+
+    const request = new chrome.cast.media.LoadRequest(mediaInfo);
+    request.autoplay = true;
+
+    session.loadMedia(request).then(() => {
+      showToast(`📺 Now Casting "${ch.name}" to TV Screen!`);
+      const castBtn = document.getElementById('ytCastBtn');
+      if (castBtn) castBtn.classList.add('casting-active');
+    }).catch(err => {
+      console.error('[Cast SDK] loadMedia error:', err);
+      showToast('⚠️ Could not load stream on TV screen.');
+    });
+  } catch (err) {
+    console.error('[Cast SDK] Media load exception:', err);
+  }
+}
+
+function fallbackRemotePlayback(ch) {
+  const video = document.getElementById('players');
+  if (video && video.remote && typeof video.remote.prompt === 'function') {
+    video.remote.prompt().then(() => {
+      showToast(`📺 Connected to Smart TV! Streaming "${ch.name}"`);
+    }).catch(err => {
+      console.log('[Remote Playback] Prompt dismissed:', err);
+      showCastGuidePrompt(ch);
+    });
+  } else if (video && video.webkitShowPlaybackTargetPicker) {
+    try {
+      video.webkitShowPlaybackTargetPicker();
+    } catch (e) {
+      showCastGuidePrompt(ch);
+    }
+  } else {
+    showCastGuidePrompt(ch);
+  }
+}
+
+function showCastGuidePrompt(ch) {
+  showToast(`📺 Cast Tip: Connect TV to same Wi-Fi. In Chrome/Edge, click (⋮) ➔ Cast to TV.`);
+}
+
+function launchVlcStream(targetChannel) {
+  const ch = targetChannel || activeChannel;
+  if (!ch || !ch.url) {
+    showToast('⚠️ Please select a channel first.');
+    return;
+  }
+
+  // 1. Generate downloadable .m3u playlist file for instant 1-click VLC playback
+  const m3uContent = `#EXTM3U\n#EXTINF:-1 tvg-name="${ch.name}",${ch.name}\n${ch.url}\n`;
+  const blob = new Blob([m3uContent], { type: 'application/x-mpegurl;charset=utf-8' });
+  const downloadUrl = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = downloadUrl;
+  const safeFileName = ch.name.replace(/[^a-zA-Z0-9_-]/g, '_');
+  a.download = `${safeFileName}_VLC.m3u`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 2000);
+
+  // 2. Also trigger native vlc:// URL protocol handler if registered
+  try {
+    const vlcUrl = `vlc://${ch.url}`;
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.src = vlcUrl;
+    document.body.appendChild(iframe);
+    setTimeout(() => {
+      if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+    }, 1000);
+  } catch (e) {
+    console.warn('[VLC Protocol Launch]', e);
+  }
+
+  showToast(`🚀 Opening ${ch.name} in VLC Media Player!`);
+}
 
 function showHttpHelper(channel) {
   const overlay = document.getElementById('httpHelperOverlay');
-  if (overlay) overlay.classList.remove('hidden');
+  if (!overlay) return;
+  const ch = channel || activeChannel;
+  const titleEl = document.getElementById('helperTitle');
+  const descEl = document.getElementById('helperDesc');
+
+  if (ch) {
+    if (titleEl) titleEl.innerText = `${ch.name} - Play in VLC or Cast to TV`;
+    if (descEl) {
+      if (ch.url && ch.url.startsWith('http://')) {
+        descEl.innerText = `This stream uses unencrypted HTTP. Modern browsers restrict HTTP inside HTTPS web apps. Click "Play in VLC" to watch immediately, or Cast directly to your TV screen!`;
+      } else {
+        descEl.innerText = `This stream uses origin token security that web browsers restrict. VLC Media Player plays it smoothly! Click "Play in VLC (1-Click)" or Cast to TV.`;
+      }
+    }
+  }
+  overlay.classList.remove('hidden');
 }
 
 function dismissHttpHelper() {

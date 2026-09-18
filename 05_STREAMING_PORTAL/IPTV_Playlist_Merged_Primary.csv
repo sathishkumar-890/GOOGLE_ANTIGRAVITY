@@ -3,21 +3,21 @@ STREAM NAME,URL,CATEGORY,ICON,STATUS
 Aaryaa Tv,https://stream.ottlive.co.in/aryatvtamil/index.m3u8,Tamil,📺,Live
 Aaseervatham TV,https://mumt04.tangotv.in/m18aqlK4AASEERVATHAMTV/index.m3u8,Tamil,🪷,Live
 Aastha Tamil,https://aasthaott.akamaized.net/110923/smil:aasthatamil.smil/playlist.m3u8,Tamil,🪷,Live
-Angel TV Indo-China,https://janya-digimix.akamaized.net/vglive-sk-703035/indochina/ngrp:angelindochina_all/playlist.m3u8,Tamil,🪷,Dead
+Angel TV Indo-China,https://janya-digimix.akamaized.net/vglive-sk-703035/indochina/ngrp:angelindochina_all/playlist.m3u8,Tamil,🪷,Live
 Arputhar Yesu TV,https://account33.livebox.co.in/jesushelpshls/live.m3u8,Tamil,🪷,Live
 Colors Tamil HD,https://da86m1sqpm3o0.cloudfront.net/28072023/smil:colorstamilhd11.smil/playlist.m3u8,Tamil,✨,Live
 Dharsan TV,https://cable91tataplay.akamaized.net/live/dharshantv/index.m3u8,Tamil,🪷,Live
 ETV Bal Bharat,http://103.185.24.134:3001/ETV-BAL-BHARAT/index.m3u8,Tamil,👶,Live
 Fail Army,https://failarmy-international-in.samsung.wurl.tv/playlist.m3u8,English,🌐,Live
 Hebron TV,https://account20.livebox.co.in/charleshls/live.m3u8,Tamil,🪷,Live
-Hosanna TV,https://asia.mslivestream.net/mslive/bfba54c5c96a6359e2da0ca35f4998af.sdp/playlist.m3u8,Tamil,🪷,Dead
+Hosanna TV,https://asia.mslivestream.net/mslive/bfba54c5c96a6359e2da0ca35f4998af.sdp/playlist.m3u8,Tamil,🪷,Live
 Hungama TV,http://103.185.24.134:3001/HUNGAMA/index.m3u8,Tamil,👶,Live
 Isaiaruvi Tv,https://segment.yuppcdn.net/140622/isaiaruvi/playlist.m3u8,Tamil,📺,Live
 Joy TV,https://ktismaservers.in:3412/live/joytvlive.m3u8,Tamil,🪷,Live
 Kalaignar Murasu,https://yuppmedtaorire.akamaized.net/v1/master/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/murasu_nim_https/050522/murasu/playlist.m3u8,Tamil,📰,Live
 Kalaignar Tv,https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8,Tamil,📺,Live
 Life TV,https://lifetv.livebox.co.in/lifetvhls/lifetv.m3u8,Tamil,🪷,Live
-Madha TV,https://mumt07.tangotv.in/zHjX9OFlMADHATV/index.m3u8,Tamil,🪷,Dead
+Madha TV,https://mumt07.tangotv.in/zHjX9OFlMADHATV/index.m3u8,Tamil,🪷,Live
 Madhimugam TV,https://mumt01.tangotv.in/O5aw8Zn3MATHIMUGAMTV/index.m3u8,Tamil,📰,Live
 Makkal TV (576i),https://5k8q87azdy4v-hls-live.wmncdn.net/MAKKAL/271ddf829afeece44d8732757fba1a66.sdp/playlist.m3u8,Tamil,📺,Live
 Mei Alai TV,https://meialai.iptelevishion.com/meialai/2/index.m3u8,Tamil,📺,Live
@@ -42,17 +42,17 @@ Roja TV1,https://live.rojatv.cloud/rojatv/rojatv/index.m3u8,Tamil,📺,Live
 Roja TV2,https://stream.rojatv.cloud/rojatv/rojatv/index.m3u8,Tamil,📺,Live
 Sai TV,https://mumt03.tangotv.in/Dsly5z3HSAITV/index.m3u8,Tamil,📺,Live
 Sairam TV,https://mumt04.tangotv.in/m18aqlK4SAIRAMTV/index.m3u8,Tamil,🪷,Live
-Sana Plus,https://mumbai-edge.smartplaytv.in/SanaPlusHD/index.m3u8,Tamil,🎵,Dead
+Sana Plus,https://mumbai-edge.smartplaytv.in/SanaPlusHD/index.m3u8,Tamil,🎵,Live
 Sanaa Tv,https://vglivessai.akamaized.net/us/v1/master/611d79b11b77e2f571934fd80ca1413453772ac7/b6d9e864-ec16-410a-804d-ccf8f720bfaa/index.m3u8,Tamil,📺,Live
 Sankara TV,https://mumt05.tangotv.in/87NeALx2SRISANKARA/index.m3u8,Tamil,🪷,Live
 Sirippoli TV1,https://segment.yuppcdn.net/240122/siripoli/playlist.m3u8,Tamil,📺,Live
 Sirippoli TV2,https://yuppmedtaorire.akamaized.net/v1/manifest/a0d007312bfd99c47f76b77ae26b1ccdaae76cb1/siripoli_nim_https/c4e6500f-ea05-4226-810e-2833ee0075ff/0.m3u8,Tamil,📺,Live
 Sivan TV,https://sivantv.livebox.co.in/sivantvhls/sivan.m3u8,Tamil,🪷,Live
 Sonic,http://103.185.24.134:3001/SONIC/index.m3u8,Tamil,👶,Live
-Sony BBC Earth HD,https://cloudplay-sonyliv.pages.dev/bbcearthhd.m3u8,Tamil,✨,Dead
-Sony pix HD,https://cloudplay-sonyliv.pages.dev/pixhd.m3u8,English,✨,Dead
-Sony Sports Ten 4,https://cloudplay-sonyliv.pages.dev/ten4.m3u8,Tamil,🏏,Dead
-Sony Yay!,https://cloudplay-sonyliv.pages.dev/yay.m3u8,Tamil,👶,Dead
+Sony BBC Earth HD,https://cloudplay-sonyliv.pages.dev/bbcearthhd.m3u8,Tamil,✨,Live
+Sony pix HD,https://cloudplay-sonyliv.pages.dev/pixhd.m3u8,English,✨,Live
+Sony Sports Ten 4,https://cloudplay-sonyliv.pages.dev/ten4.m3u8,Tamil,🏏,Live
+Sony Yay!,https://cloudplay-sonyliv.pages.dev/yay.m3u8,Tamil,👶,Live
 South Station Tv,https://cc-yw7ztecy8do3q.akamaized.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/cc-yw7ztecy8do3q/SS_IN.m3u8,Hindi,🎬,Live
 Star Vijay,https://da86m1sqpm3o0.cloudfront.net/28072023/smil:starvijayuk.smil/playlist.m3u8,Tamil,⭐,Live
 Subin Tv,https://stream.galaxyott.live/live/subintv/index.m3u8,Tamil,📺,Live
@@ -63,7 +63,7 @@ Tamilan TV,https://mumt04.tangotv.in/m18aqlK4TAMILANTELEVISION/index.m3u8,Tamil,
 Thalaa Tv,https://streams2.sofast.tv/ptnr-yupptv/title-THALAA-TV-TAM/sofastplayout/981f8f06-782a-4962-b5e0-7dcccd65279c_0_HLS/manifest.m3u8,Tamil,📺,Live
 Thanthi Tv,https://streams.tangotv.in/THANTHITV/ORIGIN/index.m3u8,Tamil,📰,Live
 Tharun Movies,https://streaming.livebox.co.in/tharunmovieshls/live.m3u8,Tamil,📺,Live
-Toonami Movie,http://api.toonamiaftermath.com:3000/movies/playlist.m3u8,English,🌐,Dead
+Toonami Movie,http://api.toonamiaftermath.com:3000/movies/playlist.m3u8,English,🌐,Live
 Travelxp HD,https://amg00416-amg00416c9-samsung-in-4882.playouts.now.amagi.tv/playlist/amg00416-travelxp-travelxphd-samsungin/playlist.m3u8,Tamil,🌍,Live
 TVI HD,https://live.cmr24.fm/TVI/HD/chunks.m3u8,Tamil,📺,Live
 Ultimate TV1,https://stream.ottlive.co.in/utvtamil/index.m3u8,Tamil,📺,Live

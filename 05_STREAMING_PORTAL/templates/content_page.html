@@ -11,6 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{% static 'css/modern_player.css' %}">
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+  <script src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js?loadCastFramework=1"></script>
 </head>
 <body>
 
@@ -71,34 +72,43 @@
           </div>
         </div>
 
-        <!-- Insecure HTTP Stream Helper Overlay -->
+        <!-- Stream Playback, VLC & Cast Helper Overlay -->
         <div class="http-helper-overlay hidden" id="httpHelperOverlay">
           <div class="http-helper-card">
             <div class="http-warning-icon">
-              <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-                <line x1="12" y1="9" x2="12" y2="13"></line>
-                <line x1="12" y1="17" x2="12.01" y2="17"></line>
+              <svg width="38" height="38" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
               </svg>
             </div>
-            <h3 class="http-helper-title">Insecure HTTP Stream Detected</h3>
-            <p class="http-helper-desc">This channel broadcasts over HTTP. Modern web browsers protect HTTPS sites by restricting unencrypted media streams by default.</p>
+            <h3 class="http-helper-title" id="helperTitle">Stream Broadcasting Live</h3>
+            <p class="http-helper-desc" id="helperDesc">This stream is broadcasting live. If your browser blocks unencrypted HTTP or Akamai CORS tokens, play it directly in VLC Player or cast to your TV screen!</p>
             
-            <div class="http-guide-box">
-              <div class="http-guide-title">💡 Enable In-Browser Playback in 5 Seconds:</div>
+            <div class="http-guide-box" id="httpGuideBox">
+              <div class="http-guide-title">💡 Instant Playback Options:</div>
               <ol class="http-guide-steps">
-                <li>Click the <b>Tune / Lock icon (🔒 or 🎛️)</b> in your address bar above.</li>
-                <li>Select <b>Site settings</b>.</li>
-                <li>Set <b>Insecure content</b> from <i>Block</i> to <b>Allow</b>.</li>
-                <li>Reload this page and enjoy direct playback!</li>
+                <li><b>VLC 1-Click:</b> Click <i>"Play in VLC"</i> below to open and watch immediately.</li>
+                <li><b>Cast to TV:</b> Click <i>"Cast to TV"</i> to stream to nearby Smart TVs / Chromecast.</li>
+                <li><b>In-Browser:</b> Under Site Settings, set <i>Insecure content</i> to <i>Allow</i>.</li>
               </ol>
             </div>
 
             <div class="http-actions-row">
-              <button class="btn-external-play" id="btnExternalPlay" onclick="openStreamExternally()">
-                <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <span>Open in External Player / VLC</span>
+              <button class="btn-external-play btn-vlc-action" id="btnVlcPlay" onclick="launchVlcStream()" title="Play in VLC Media Player">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2L4 18h16L12 2zm0 4.2l4.8 9.8H7.2L12 6.2zM2 20h20v2H2v-2z"/>
+                </svg>
+                <span>Play in VLC (1-Click)</span>
               </button>
+
+              <button class="btn-cast-action" id="btnOverlayCast" onclick="castStreamToTv()" title="Cast to Smart TV / Chromecast">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+                <span>Cast to TV</span>
+              </button>
+
               <button class="btn-dismiss-helper" onclick="dismissHttpHelper()">Dismiss</button>
             </div>
           </div>
@@ -160,6 +170,13 @@
                   </div>
                 </div>
               </div>
+
+              <!-- Cast to TV -->
+              <button class="yt-btn" id="ytCastBtn" onclick="castStreamToTv()" title="Cast to Nearby TV Screen (Chromecast / Smart TV)">
+                <svg class="yt-icon" id="ytCastIcon" viewBox="0 0 24 24">
+                  <path d="M1 18v3h3c0-1.66-1.34-3-3-3zm0-4v2c2.76 0 5 2.24 5 5h2c0-3.87-3.13-7-7-7zm0-4v2c4.97 0 9 4.03 9 9h2c0-6.08-4.93-11-11-11zm20-7H3c-1.1 0-2 .9-2 2v3h2V5h18v14h-7v2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"/>
+                </svg>
+              </button>
 
               <!-- PiP -->
               <button class="yt-btn" id="ytPipBtn" onclick="togglePiP()" title="Picture in Picture">
