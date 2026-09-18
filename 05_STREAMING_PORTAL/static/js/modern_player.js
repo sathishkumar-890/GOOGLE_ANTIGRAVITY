@@ -25,14 +25,14 @@ let channelData = (window.INITIAL_CHANNELS && window.INITIAL_CHANNELS.length > 0
     "resolution": "640x360"
   },
   {
-    "id": "sony_pix_hd",
-    "name": "Sony Pix HD",
-    "cat": "English",
-    "icon": "✨",
-    "url": "https://cloudplay-sonyliv.pages.dev/pixhd.m3u8",
+    "id": "sivan_tv",
+    "name": "Sivan TV",
+    "cat": "Tamil",
+    "icon": "🔱",
+    "url": "https://sivantv.livebox.co.in/sivantvhls/sivan.m3u8",
     "status": "Live",
     "live": true,
-    "resolution": "384x216"
+    "resolution": "1920x1080"
   },
   {
     "id": "kalaignar_tv",
@@ -188,19 +188,20 @@ function parseCsvToChannels(csvText) {
     const icon = (row[3] || '').trim() || CAT_ICONS[cat] || '📺';
     const status = (row[4] || '').trim() || 'Live';
     const isLive = ['live', 'working', 'playing', 'active', 'online'].includes(status.toLowerCase());
+    if (!isLive) continue; // Only load verified live channels into the user interface
 
     let slug = name.toLowerCase().replace(/[^a-z0-9_]+/g, '_').replace(/^_+|_+$/g, '');
     if (!slug) slug = `ch_${i}`;
 
-    channels.append = channels.push({
+    channels.push({
       id: slug,
       name: name,
       cat: cat,
       icon: icon,
       url: url,
-      status: isLive ? 'Live' : 'Dead',
-      live: isLive,
-      resolution: isLive ? 'HD' : '0x0'
+      status: 'Live',
+      live: true,
+      resolution: 'HD'
     });
   }
 
@@ -365,24 +366,7 @@ function switchChannel(channel) {
   const activeEl = document.getElementById(`card-${channel.id}`);
   if (activeEl) activeEl.classList.add('active');
 
-  const nameEl = document.getElementById('currentChannelName');
-  const logoEl = document.getElementById('channelLogo');
-  const badgeEl = document.getElementById('currentChannelBadge');
-
-  if (nameEl) nameEl.innerText = channel.name;
-  if (logoEl) logoEl.innerText = channel.icon || '📺';
-
   dismissHttpHelper();
-
-  if (badgeEl) {
-    if (channel.url && channel.url.startsWith('http://') && window.location.protocol === 'https:') {
-      badgeEl.className = 'channel-badge-pill warning';
-      badgeEl.innerText = 'HTTP STREAM';
-    } else {
-      badgeEl.className = 'channel-badge-pill live';
-      badgeEl.innerText = 'LIVE • HD';
-    }
-  }
 
   hideStandbyOverlay();
   playStream(channel.url);
