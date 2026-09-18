@@ -857,27 +857,27 @@ video {
   box-shadow: 0 15px 40px rgba(239, 68, 68, 0.65);
 }
 
-/* Futuristic Standby Glass Card & Quick Chips */
-.standby-glass-card {
+/* Simple Clean Standby Banner */
+.simple-banner-card {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 0.85rem;
-  padding: 2.2rem 2.5rem;
-  max-width: 620px;
+  gap: 0.6rem;
+  padding: 2.5rem 2.2rem;
+  max-width: 500px;
   width: 90%;
-  background: rgba(15, 23, 42, 0.82);
+  background: rgba(15, 23, 42, 0.88);
   border: 1px solid rgba(255, 255, 255, 0.12);
   backdrop-filter: blur(24px);
-  border-radius: 1.5rem;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7), 0 0 40px rgba(239, 68, 68, 0.15);
-  animation: fadeInStandby 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  border-radius: 1.25rem;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 35px rgba(239, 68, 68, 0.15);
+  animation: fadeInBanner 0.4s ease-out;
   position: relative;
   overflow: hidden;
 }
 
-.standby-glass-card::before {
+.simple-banner-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -888,96 +888,90 @@ video {
   animation: sweepBorder 4s infinite linear;
 }
 
-@keyframes sweepBorder {
-  0% { transform: translateX(-50%); }
-  100% { transform: translateX(50%); }
+@keyframes fadeInBanner {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-.standby-top-badge-row {
+.banner-tv-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 1.25rem;
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  margin-bottom: 0.2rem;
-}
-
-.standby-network-tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.45rem;
-  background: rgba(239, 68, 68, 0.15);
-  border: 1px solid rgba(239, 68, 68, 0.35);
-  color: #fca5a5;
-  font-size: 0.7rem;
-  font-weight: 700;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  letter-spacing: 0.06em;
-}
-
-.standby-count-tag {
-  display: inline-flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 0.25rem 0.7rem;
-  border-radius: 9999px;
-}
-
-.standby-welcome-user {
-  font-size: 0.75rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #94a3b8;
-  margin-bottom: 0.25rem;
-}
-
-.standby-welcome-user .user-highlight {
-  color: #f87171;
-  text-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
-}
-
-.standby-subtitle {
-  font-size: 0.85rem;
-  color: #94a3b8;
-  margin-top: 0.2rem;
-}
-
-.standby-actions-row {
-  margin-top: 0.3rem;
-}
-
-.standby-quick-chips {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
   justify-content: center;
-  gap: 0.45rem;
-  margin-top: 0.5rem;
-  padding-top: 0.8rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 0.8rem;
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.25);
+  animation: pulseTvIcon 2.5s infinite alternate ease-in-out;
 }
 
-.quick-chip-label {
-  font-size: 0.72rem;
-  color: #64748b;
-  font-weight: 600;
-  margin-right: 0.2rem;
+@keyframes pulseTvIcon {
+  0% { transform: scale(1); box-shadow: 0 0 20px rgba(239, 68, 68, 0.2); }
+  100% { transform: scale(1.06); box-shadow: 0 0 35px rgba(239, 68, 68, 0.45); }
 }
 
-.quick-chip {
+.banner-live-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 9999px;
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #86efac;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.6rem;
+}
+
+.banner-live-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #22c55e;
+  box-shadow: 0 0 8px #22c55e;
+  animation: pulse-sync-green 2s infinite;
+}
+
+.simple-banner-title {
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #ffffff;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+.simple-banner-subtitle {
+  font-size: 0.92rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-bottom: 1.2rem;
+}
+
+.banner-prompt-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.65rem 1.25rem;
   background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
-  font-size: 0.72rem;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  font-size: 0.82rem;
   font-weight: 600;
-  padding: 0.28rem 0.7rem;
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
+  color: #cbd5e1;
+}
+
+.banner-prompt-icon {
+  font-size: 1.1rem;
+  animation: bounce-hand 1.5s infinite alternate ease-in-out;
+}
+
+@keyframes bounce-hand {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(5px); }
 }
 
 .quick-chip:hover {

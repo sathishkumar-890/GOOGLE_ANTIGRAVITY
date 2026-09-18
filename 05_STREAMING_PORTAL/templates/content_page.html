@@ -53,57 +53,28 @@
         <!-- Video Element -->
         <video id="players" playsinline></video>
 
-        <!-- Modern High-Tech Standby / Live Splash Overlay -->
+        <!-- Simple Banner: Choose Stream or Click Channels to Play Video -->
         <div class="stream-standby-overlay" id="standbyOverlay">
-          <div class="standby-glass-card">
+          <div class="simple-banner-card">
+            <div class="banner-tv-icon">
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="7" width="20" height="15" rx="2" ry="2"></rect>
+                <polyline points="17 2 12 7 7 2"></polyline>
+              </svg>
+            </div>
             
-            <div class="standby-top-badge-row">
-              <div class="standby-network-tag">
-                <span class="standby-live-pulse"></span>
-                <span>NEXUS STREAM ENGINE • LIVE HUB</span>
-              </div>
-              <div class="standby-count-tag">
-                <span id="standbyChannelCount">📡 {{ channel_count|default:"36" }} CHANNELS ONLINE</span>
-              </div>
+            <div class="banner-live-status">
+              <span class="banner-live-dot"></span>
+              <span id="standbyChannelCount">📡 {{ channel_count|default:"36" }} CHANNELS READY</span>
             </div>
 
-            <div class="standby-logo-glow" id="standbyLogo">✨</div>
+            <h2 class="simple-banner-title">Choose Stream to Watch</h2>
+            <p class="simple-banner-subtitle">Click any channel from the playlist to play video</p>
 
-            <div class="standby-title-group">
-              <div class="standby-welcome-user">WELCOME BACK, <span class="user-highlight">{{ request.user.username|title|default:"VIEWER" }}</span></div>
-              <h1 class="standby-title" id="standbyTitle">Select a Stream or Watch Featured</h1>
-              <p class="standby-subtitle" id="standbySubtitle">1080p Ultra-HD • Instant Multi-Language Satellite Feeds</p>
+            <div class="banner-prompt-pill">
+              <span class="banner-prompt-icon">👉</span>
+              <span>Select any channel from the playlist on the right</span>
             </div>
-
-            <div class="standby-status-pill">
-              <span class="standby-live-pulse"></span>
-              <span id="standbyStatus">Ready to Stream</span>
-            </div>
-
-            <!-- Animated Soundwave Equalizer -->
-            <div class="soundwave-bar-group">
-              <div class="soundwave-bar"></div>
-              <div class="soundwave-bar"></div>
-              <div class="soundwave-bar"></div>
-              <div class="soundwave-bar"></div>
-              <div class="soundwave-bar"></div>
-              <div class="soundwave-bar"></div>
-              <div class="soundwave-bar"></div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="standby-actions-row">
-              <button class="standby-play-btn" onclick="startStreamPlayback()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-                <span id="standbyPlayBtnText">▶ START STREAMING NOW</span>
-              </button>
-            </div>
-
-            <!-- Quick Jump Shortcuts -->
-            <div class="standby-quick-chips" id="standbyQuickChips">
-              <!-- Dynamically populated from Google Sheet -->
-            </div>
-
           </div>
         </div>
 
@@ -185,8 +156,8 @@
         <div class="current-channel-info">
           <div id="channelLogo" class="channel-logo-display">📺</div>
           <div class="channel-meta">
-            <h3 id="currentChannelName">Loading Stream...</h3>
-            <p id="currentChannelUrl">Connecting to Google Sheet playlist...</p>
+            <h3 id="currentChannelName">No Stream Selected</h3>
+            <p id="currentChannelUrl">Choose a stream or click any channel from the playlist to play video</p>
           </div>
         </div>
 

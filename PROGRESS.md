@@ -148,6 +148,16 @@
      - Configured automated background interval syncing **every 5 minutes** so any new channels or categories added to the Google Sheet reflect automatically without app restart.
      - Implemented dynamic category pill generator that calculates exact channel counts and category chips on the fly (`All (36)`, `Tamil (31)`, `Hindi (3)`, `English (2)`).
      - Verified live on PythonAnywhere via automated Selenium testing (`live_sync_portal_dashboard.png`, `live_sync_toast_active.png`).
+   - **Simple Standby Banner & Disabled Autoplay on Login**:
+     - Disabled automatic playback of the 1st channel upon login (`activeChannel = null`).
+     - Replaced complex overlay with a clean, modern **Simple Banner**:
+       - TV icon with ambient neon glow
+       - Ready badge: `📡 36 CHANNELS READY`
+       - Heading: `Choose Stream to Watch`
+       - Subtitle: `Click any channel from the playlist to play video`
+       - Guide badge: `👉 Select any channel from the playlist on the right`
+     - When user clicks any channel from the sidebar playlist, the banner smoothly hides and live video playback begins instantly.
+     - Verified live on PythonAnywhere with automated Selenium test (`live_simple_banner_standby.png` and `live_user_clicked_stream_playing.png`).
 
 ---
 

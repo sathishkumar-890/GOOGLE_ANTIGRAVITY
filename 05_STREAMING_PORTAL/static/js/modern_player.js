@@ -46,7 +46,7 @@ let channelData = (window.INITIAL_CHANNELS && window.INITIAL_CHANNELS.length > 0
   }
 ];
 
-let activeChannel = channelData[0] || {};
+let activeChannel = null;
 let currentFilter = 'all';
 let currentHls = null;
 let currentLevelIndex = -1;
@@ -359,6 +359,7 @@ function filterCategory(cat, el) {
 }
 
 function switchChannel(channel) {
+  if (!channel) return;
   if (isRecording) {
     showToast('⚠️ Stop recording before changing channels!');
     return;
@@ -376,9 +377,9 @@ function switchChannel(channel) {
   if (urlEl) urlEl.innerText = channel.url;
   if (logoEl) logoEl.innerText = channel.icon || '📺';
 
-  showStandbyOverlay(channel.name, channel.icon, channel.cat);
+  hideStandbyOverlay();
   playStream(channel.url);
-  showToast(`Switched to ${channel.name}`);
+  showToast(`▶ Playing: ${channel.name}`);
 }
 
 // --- 2. HLS PLAYBACK & DYNAMIC RESOLUTION ---
@@ -774,10 +775,8 @@ window.addEventListener('DOMContentLoaded', () => {
   renderChannels(channelData);
   updateStandbyTags();
 
-  if (channelData.length > 0) {
-    activeChannel = channelData[0];
-    switchChannel(channelData[0]);
-  }
+  // DO NOT autoplay first channel! Keep the simple standby banner visible:
+  showStandbyBanner();
 
   // 2. Perform background sync to catch any newer additions in Google Sheet
   fetchChannelsFromSheet(false);
@@ -851,25 +850,25 @@ function startStreamPlayback() {
 
 function hideStandbyOverlay() {
   const overlay = document.getElementById('standbyOverlay');
-  if (overlay) overlay.classList.add('hidden');
+  if (overlay) {
+    overlay.classList.add('hidden');
+    overlay.style.display = 'none';
+  }
 }
 
-function showStandbyOverlay(name, icon, cat) {
+function showStandbyBanner() {
   const overlay = document.getElementById('standbyOverlay');
   if (overlay) {
-    const titleEl = document.getElementById('standbyTitle');
-    const logoEl = document.getElementById('standbyLogo');
-    const statusEl = document.getElementById('standbyStatus');
-    const subEl = document.getElementById('standbySubtitle');
-    const playBtnText = document.getElementById('standbyPlayBtnText');
-
-    if (titleEl) titleEl.innerText = name;
-    if (logoEl) logoEl.innerText = icon || '📺';
-    if (statusEl) statusEl.innerText = `Ready to Stream • ${name} (${cat || 'Live'})`;
-    if (subEl) subEl.innerText = `${cat || 'Live'} Satellite Feed • Instant HLS Stream`;
-    if (playBtnText) playBtnText.innerText = `▶ Watch ${name}`;
     overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
   }
+  const nameEl = document.getElementById('currentChannelName');
+  const urlEl = document.getElementById('currentChannelUrl');
+  const logoEl = document.getElementById('channelLogo');
+
+  if (nameEl) nameEl.innerText = 'No Stream Selected';
+  if (urlEl) urlEl.innerText = 'Choose a stream or click any channel from the playlist to play video';
+  if (logoEl) logoEl.innerText = '📺';
 }
 
 function quickJumpCategory(catName) {

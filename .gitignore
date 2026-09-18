@@ -13,3 +13,13 @@ Thumbs.db
 
 # Root open file during migration
 /VL_IRENE WISDOM.xlsx
+/VL_IRENES REWARD.xlsx
+
+# Temporary scratch and backup files
+/dashboard.html
+/post_login.html
+/channels_google_sheet.json
+/Taiko_Inspection_*.png
+05_STREAMING_PORTAL/*remote*
+*BACKUP*.xlsx
+*backup*.xlsx
