@@ -30,9 +30,15 @@
     - Intact `SYSTEM_DESCRIPTION` formulas across all 499 rows referencing Column N (`_xlfn.CONCAT(C{r}," ",F{r}," ",G{r}," ",N{r})`). 0 formula errors.
   - **Function Description Population (`VL_EXTRACTION_WISDOM-MAINVDC.xlsx`)**:
     - Matched all 277 equipment items against `C.V. IRENES WISDOM_FUN.xlsx` (Allocation Sheet, Column M `FUNCTION` and Column N `MACHINERY NAME`).
-    - Successfully populated Column 6 (`Function Description`) across all 277 rows with 100% genuine function categories (e.g., `HEATING, VENTILATION & AIR CONDITIONING`, `PUMP`, `NAVIGATION EQUIPMENT`, `ELECTRICAL SYSTEM`, `COMMUNICATIONS`, `PROPELLER, THRUSTER, STERN TUBE, SHAFTING`, `REFRIGERATION`, `MAIN ENGINE`, `COOLERS`, `F.W. GENERATOR, HEAT EXCHANGER`, etc.).
-    - Verified 0 missing, 0 empty, and 100% valid function strings matching the master taxonomy.
-    - Preserved all other 15 columns intact (Vessel Code, Location Code, Location Description, System Code, System Description, Maker, Serial Number, Particulars, Manual Name, Model, etc.).
+    - Successfully populated Column 6 (`Function Description`) across all 277 rows with 100% genuine function categories.
+    - Preserved all other 15 columns intact.
+  - **Function Description Population for Sister Vessel REWARD (`VL_EXTRACTION_I.REWARD_MAIN VDC.xlsx`)**:
+    - Extracted all machinery and function pairs from `C.V. IRENES REWARD_FUN.xlsx` (Allocation Sheet, Row 11 headers: Column I `FUNCTION` and Column J `MACHINERY NAME`).
+    - Built comprehensive mapping module `build_reward_function_mapping.py` adapting the sister vessel taxonomy across all 278 equipment rows (Rows 2 to 279).
+    - Populated Column 6 (`Function Description` in `MAIN VDC_REWARD` and `FUNCTION DESCRIPTION` in `Reward (2)`) across all 278 rows.
+    - Verified 0 missing, 0 empty cells, and 100% valid function strings strictly belonging to the REWARD FUN taxonomy (e.g. `MEASUREMENT INSTRUMENTS` for Loading Computer, `HEAT EXCHANGER` for coolers, `AIR CONDITION` for AC plants, `SCRUBBER SYSTEM` for EGCS, `ELEVATOR` for crew elevator, `ELECTRONIC EQ.` for shaft earthing and CCTV, `FIRE DETECTION & ALARM SYSTEM` for ERAMS and signal light columns, `NAVIGATION EQUIPMENT` for marine radars & auto pilot).
+    - Preserved all other 15 columns in `MAIN VDC_REWARD` and all formulas in `Reward (2)` 100% intact and untouched.
+    - Full integrity verification passed (`verify_reward_vdc_integrity.py`). Backup saved to `VL_EXTRACTION_I.REWARD_MAIN VDC_BACKUP.xlsx`.
 - **Next Steps**:
   - Proceed with downstream PMS spares extraction or further VDC validation tasks.
 
@@ -158,6 +164,21 @@
        - Guide badge: `👉 Select any channel from the playlist on the right`
      - When user clicks any channel from the sidebar playlist, the banner smoothly hides and live video playback begins instantly.
      - Verified live on PythonAnywhere with automated Selenium test (`live_simple_banner_standby.png` and `live_user_clicked_stream_playing.png`).
+   - **Sheet2 Verification & Primary IPTV Sheet Expansion (80 Verified Live Channels)**:
+     - Analyzed all 182 rows (129 unique stream URLs) in `Sheet2` of the Google Sheet.
+     - Tested real video playback in Headless Chrome (`Hls.js` video decoder pool, `videoWidth > 0 && currentTime > 0.05s`).
+     - Results: **🟢 79 LIVE streams** (decoding up to 1080p), **🔴 50 DEAD streams**.
+     - Updated Sheet2 status column: saved `05_STREAMING_PORTAL/Sheet2_Updated_Status.csv` and `Sheet2_Updated_Status.xlsx`.
+     - **Deduplication & Multi-Stream Formatting**:
+       - Zero duplicate URLs added to primary sheet (35 existing URLs detected and skipped).
+       - Multi-stream separation applied for channels with multiple live streams:
+         - `Sirippoli TV1` & `Sirippoli TV2`
+         - `Roja TV1` & `Roja TV2`
+         - `Ultimate TV1` & `Ultimate TV2`
+       - Revived high-demand channels: `Thanthi Tv`, `Velicham Tv`, `Vendhar TV`, `Win Tv`, `Vasanth TV`, `7s Music Tv`, `Colors Tamil HD`, `News18 Tamil Nadu`, `ETV Bal Bharat`, `Travelxp HD`.
+     - **Webhook Sync**: Overwrote Primary `IPTV_Playlist` sheet with 81 rows (1 header + 80 channels) with dark header styling and green status fill.
+     - **Live Portal Verification**: Tested on `sathishkumar890.pythonanywhere.com` with automated Selenium tests; confirmed 80 channels rendered in playlist, dual-stream tags, and instant video playback on `Roja TV1` (1080p) and `Thanthi Tv` (360p).
+     - Saved artifacts: `live_80_channels_merged_standby.png`, `live_roja_tv1_stream_playing.png`, and `live_thanthi_tv_stream_playing.png`.
 
 ---
 
