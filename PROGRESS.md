@@ -17,10 +17,24 @@
   - `VL_IRENE WISDOM.xlsx`: Machinery particulars completed up to Page 57 (499 equipment rows).
   - `VL_IRENE WISDOM (1).xlsx`: Successfully generated and verified unique `LOCATION_CODE` (Column A, max 8 chars) and `SYSTEM_CODE` (Column D) with 0 duplicate values.
   - `VL_IRENES REWARD.xlsx`: Full 57-page booklet comparison completed. Created dedicated sister vessel workbook with all differences applied and highlighted in **RED** (`FFFF0000`) across columns A to L (Rows 60, 61, 72, 264, 370, 414, 426, 439, 443, 444, 445, 446, and new Row 500 for `AMP SYSTEM`).
-  - Traceability manual reference updated to `B-23_DATA BOOKLETS(MACHINERY PARTICULAR LIST IRENES REWARD) (1).pdf` across all populated equipment rows.
-  - Verified 0 formula errors, 100% UPPERCASE and ASCII compliance, intact `CONCAT` formulas.
+  - **Serial Number Strict Policy (`MANUALS_REWARD`)**:
+    - Removed drawing numbers / plan numbers from Column H, I, and J across all machinery where drawing numbers had been mistakenly taken from manual cover/first pages.
+    - Preserved **ONLY genuine verified engine numbers** on Rows 92, 93, 94 highlighted in solid **GREEN** (`FF92D050`):
+      - **Row 92 (D/G Engine No. 1)**: `KBA008085-1` | `VOL 2.pdf` | Page `643`
+      - **Row 93 (D/G Engine No. 2)**: `KBA008085-2` | `VOL 2.pdf` | Page `644`
+      - **Row 94 (D/G Engine No. 3)**: `KBA008085-3` | `VOL 2.pdf` | Page `645`
+    - All remaining 496 rows are kept strictly **blank** (`None`) in `S.NO`, `S.NO PDF NAME`, and `S.NO PAGE NO` with no highlight and zero assumptions.
+  - **Traceability Columns (`S.NO PDF NAME` & `S.NO PAGE NO`)**:
+    - Column I (Col 9): `S.NO PDF NAME`
+    - Column J (Col 10): `S.NO PAGE NO`
+    - Intact `SYSTEM_DESCRIPTION` formulas across all 499 rows referencing Column N (`_xlfn.CONCAT(C{r}," ",F{r}," ",G{r}," ",N{r})`). 0 formula errors.
+  - **Function Description Population (`VL_EXTRACTION_WISDOM-MAINVDC.xlsx`)**:
+    - Matched all 277 equipment items against `C.V. IRENES WISDOM_FUN.xlsx` (Allocation Sheet, Column M `FUNCTION` and Column N `MACHINERY NAME`).
+    - Successfully populated Column 6 (`Function Description`) across all 277 rows with 100% genuine function categories (e.g., `HEATING, VENTILATION & AIR CONDITIONING`, `PUMP`, `NAVIGATION EQUIPMENT`, `ELECTRICAL SYSTEM`, `COMMUNICATIONS`, `PROPELLER, THRUSTER, STERN TUBE, SHAFTING`, `REFRIGERATION`, `MAIN ENGINE`, `COOLERS`, `F.W. GENERATOR, HEAT EXCHANGER`, etc.).
+    - Verified 0 missing, 0 empty, and 100% valid function strings matching the master taxonomy.
+    - Preserved all other 15 columns intact (Vessel Code, Location Code, Location Description, System Code, System Description, Maker, Serial Number, Particulars, Manual Name, Model, etc.).
 - **Next Steps**:
-  - Await further instructions or sister vessel data booklets.
+  - Proceed with downstream PMS spares extraction or further VDC validation tasks.
 
 ---
 
@@ -121,6 +135,12 @@
     - **Deployed to PythonAnywhere**:
       - Synchronized `modern_player.js` with the updated Live/Dead channel status.
       - Deployed to `sathishkumar890.pythonanywhere.com` via REST API and reloaded the web application.
+   - **Direct Google Sheets Webhook Integration (Full Real-Time Write Control)**:
+     - Configured Google Apps Script Web App: `https://script.google.com/macros/s/AKfycbwhOmBGplMtm5BIRP58sG6KOmazzrhmA5LypzMqoA17K_y6m96CteMRQ6sXnCidgaUZ/exec`
+     - Created `05_STREAMING_PORTAL/google_sheet_sync.py` with `ping()`, `update_statuses()`, and `sync_all()`.
+     - Confirmed direct write access: executed live status update across all 36 active channels directly in the Google Sheet.
+     - Verified new addition: `Sony Pix HD` (`https://cloudplay-sonyliv.pages.dev/pixhd.m3u8`) confirmed playing live video frames (`384x216`), added to portal, and synced to Google Sheet.
+     - Captured live portal verification screenshots: `live_verified_portal_dashboard.png` and `live_verified_stream_playing.png`.
 
 ---
 

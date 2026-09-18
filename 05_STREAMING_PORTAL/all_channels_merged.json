@@ -240,6 +240,16 @@
     "resolution": "384x216"
   },
   {
+    "id": "sony_pix_hd",
+    "name": "Sony Pix HD",
+    "cat": "English",
+    "icon": "✨",
+    "url": "https://cloudplay-sonyliv.pages.dev/pixhd.m3u8",
+    "status": "Live",
+    "live": true,
+    "resolution": "384x216"
+  },
+  {
     "id": "sony_sports_ten_4",
     "name": "Sony Sports Ten 4",
     "cat": "Tamil",
@@ -765,16 +775,6 @@
     "cat": "Hindi",
     "icon": "📺",
     "url": "https://sl.vodep39240327.workers.dev/channel/SONY%20MAX%20HD.m3u8",
-    "status": "Dead",
-    "live": false,
-    "resolution": "0x0"
-  },
-  {
-    "id": "sony_pix_hd",
-    "name": "Sony PIX HD",
-    "cat": "English",
-    "icon": "📺",
-    "url": "https://sl.vodep39240327.workers.dev/channel/SONY%20PIX%20HD.m3u8",
     "status": "Dead",
     "live": false,
     "resolution": "0x0"
