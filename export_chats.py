@@ -17,6 +17,14 @@ def clean_name(s: str) -> str:
     return re.sub(r"[-\s]+", "_", s)
 
 
+def sanitize_secrets(text: str) -> str:
+    if not text:
+        return ""
+    # Redact Cloudflare API tokens
+    text = re.sub(r'cfat_[A-Za-z0-9_-]+', '[REDACTED_CF_TOKEN]', text)
+    return text
+
+
 def export_all_chats():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     if not os.path.exists(DB_PATH):
@@ -54,9 +62,9 @@ def export_all_chats():
                 # Strip internal metadata wrappers
                 content = re.sub(r"<USER_REQUEST>\s*", "", content)
                 content = re.sub(r"\s*</USER_REQUEST>.*", "", content, flags=re.DOTALL)
-                chat_entries.append(("USER", content.strip()))
+                chat_entries.append(("USER", sanitize_secrets(content.strip())))
             elif msg_type == "PLANNER_RESPONSE" and content:
-                chat_entries.append(("ASSISTANT", content.strip()))
+                chat_entries.append(("ASSISTANT", sanitize_secrets(content.strip())))
 
         with open(out_path, "w", encoding="utf-8") as out:
             out.write(f"# Chat Archive: {t}\n\n")

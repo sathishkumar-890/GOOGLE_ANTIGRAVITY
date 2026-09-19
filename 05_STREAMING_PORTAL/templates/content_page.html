@@ -179,6 +179,26 @@
                 </div>
               </div>
 
+              <!-- Audio Track / Language Selector -->
+              <div class="yt-audio-container">
+                <button class="yt-btn yt-audio-btn" id="ytAudioBtn" onclick="toggleAudioDropdown()" title="Audio Language & Tracks">
+                  <svg class="yt-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 3a9 9 0 0 0-9 9v7c0 1.1.9 2 2 2h2a1 1 0 0 0 1-1v-6a1 1 0 0 0-1-1H5v-1a7 7 0 1 1 14 0v1h-2a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2a2 2 0 0 0 2-2v-7a9 9 0 0 0-9-9z"/>
+                  </svg>
+                  <span id="ytAudioText" class="yt-audio-text">AUDIO</span>
+                </button>
+
+                <div class="yt-audio-dropdown" id="ytAudioDropdown">
+                  <div class="yt-audio-title">Audio Language / Tracks</div>
+                  <div class="yt-audio-options" id="ytAudioOptions">
+                    <div class="yt-audio-item active" onclick="setAudioTrack(-1, 'Default')">
+                      <span class="yt-check">✓</span>
+                      <span>Default Audio</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Cast to TV -->
               <button class="yt-btn" id="ytCastBtn" onclick="castStreamToTv()" title="Cast to Nearby TV Screen (Chromecast / Smart TV)">
                 <svg class="yt-icon" id="ytCastIcon" viewBox="0 0 24 24">

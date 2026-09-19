@@ -1,0 +1,23 @@
+{
+  "total": 80,
+  "live_count": 77,
+  "dead_count": 3,
+  "dead_streams": [
+    {
+      "name": "Madha TV",
+      "error": "The read operation timed out",
+      "url": "https://mumt07.tangotv.in/zHjX9OFlMADHATV/index.m3u8"
+    },
+    {
+      "name": "YET Max",
+      "error": "HTTP Error 404: ",
+      "url": "https://live.yettelevision.com:5443/LiveApp/streams/yettv2.m3u8"
+    },
+    {
+      "name": "YET TV",
+      "error": "HTTP Error 404: ",
+      "url": "https://live.yettelevision.com:5443/LiveApp/streams/yettv.m3u8"
+    }
+  ],
+  "multi_audio": []
+}

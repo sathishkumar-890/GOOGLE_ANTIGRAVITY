@@ -404,6 +404,91 @@ video {
 }
 .yt-quality-item.active .yt-check { visibility: visible; }
 
+/* Audio Track & Language Selector */
+.yt-audio-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.yt-audio-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.4rem;
+  background: rgba(255, 255, 255, 0.08);
+  transition: all 0.2s ease;
+}
+.yt-audio-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+.yt-audio-btn.has-multiple-audio {
+  background: rgba(16, 185, 129, 0.15);
+  border: 1px solid rgba(16, 185, 129, 0.4);
+  color: #34d399;
+}
+.yt-audio-btn.has-multiple-audio:hover {
+  background: rgba(16, 185, 129, 0.25);
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+}
+.yt-audio-text {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  color: #fff;
+}
+.yt-audio-dropdown {
+  position: absolute;
+  bottom: calc(100% + 12px);
+  right: 0;
+  background: rgba(18, 24, 38, 0.96);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 0.75rem;
+  min-width: 180px;
+  max-height: 260px;
+  overflow-y: auto;
+  padding: 0.5rem 0;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+  display: none;
+  flex-direction: column;
+  z-index: 50;
+  animation: popIn 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.yt-audio-dropdown.show { display: flex; }
+.yt-audio-title {
+  padding: 0.4rem 1rem 0.5rem 1rem;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 0.3rem;
+}
+.yt-audio-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 1rem;
+  font-size: 0.82rem;
+  color: var(--text-main);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.yt-audio-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+.yt-audio-item.active {
+  color: #10b981;
+  font-weight: 700;
+}
+.yt-audio-item.active .yt-check {
+  visibility: visible;
+  color: #10b981;
+}
+
 
 
 /* -------------------------------------------------------------

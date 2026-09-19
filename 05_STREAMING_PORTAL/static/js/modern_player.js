@@ -50,6 +50,8 @@ let activeChannel = null;
 let currentFilter = 'all';
 let currentHls = null;
 let currentLevelIndex = -1;
+let currentAudioTrackIndex = -1;
+let availableAudioTracks = [];
 let lastSyncTimestamp = Date.now();
 
 const GOOGLE_SHEET_CSV_FALLBACK = "https://docs.google.com/spreadsheets/d/1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc/export?format=csv";
@@ -385,6 +387,7 @@ function playStream(url) {
   }
 
   resetQualityMenu();
+  resetAudioMenu();
 
   if (Hls.isSupported()) {
     const hls = new Hls({
@@ -398,7 +401,20 @@ function playStream(url) {
 
     hls.on(Hls.Events.MANIFEST_PARSED, (event, data) => {
       populateQualityMenu(data.levels);
+      if (hls.audioTracks && hls.audioTracks.length > 0) {
+        populateAudioMenu(hls.audioTracks);
+      }
       video.play().then(() => updatePlayIcon(true)).catch(() => updatePlayIcon(false));
+    });
+
+    hls.on(Hls.Events.AUDIO_TRACKS_UPDATED, (event, data) => {
+      console.log('[Audio Tracks Updated]', data.audioTracks);
+      populateAudioMenu(data.audioTracks);
+    });
+
+    hls.on(Hls.Events.AUDIO_TRACK_SWITCHED, (event, data) => {
+      console.log('[Audio Track Switched]', data.id);
+      updateActiveAudioTrackUI(data.id);
     });
 
     hls.on(Hls.Events.LEVEL_SWITCHED, (event, data) => {
@@ -437,6 +453,9 @@ function playStream(url) {
     });
   } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
     video.src = url;
+    if (video.audioTracks) {
+      populateAudioMenu(video.audioTracks);
+    }
     video.onerror = () => {
       if (activeChannel) {
         showHttpHelper(activeChannel);
@@ -512,8 +531,129 @@ function toggleQualityDropdown(forceState) {
   const dropdown = document.getElementById('ytQualityDropdown');
   if (!dropdown) return;
   const isShow = forceState !== undefined ? forceState : !dropdown.classList.contains('show');
-  if (isShow) dropdown.classList.add('show');
-  else dropdown.classList.remove('show');
+  if (isShow) {
+    toggleAudioDropdown(false);
+    dropdown.classList.add('show');
+  } else {
+    dropdown.classList.remove('show');
+  }
+}
+
+// --- 2.5 AUDIO TRACK / MULTI-LANGUAGE ENGINE ---
+
+const LANG_MAP = {
+  'tam': 'Tamil', 'ta': 'Tamil',
+  'eng': 'English', 'en': 'English',
+  'hin': 'Hindi', 'hi': 'Hindi',
+  'tel': 'Telugu', 'te': 'Telugu',
+  'mal': 'Malayalam', 'ml': 'Malayalam',
+  'kan': 'Kannada', 'kn': 'Kannada',
+  'ben': 'Bengali', 'bn': 'Bengali',
+  'mar': 'Marathi', 'mr': 'Marathi',
+  'und': 'Original'
+};
+
+function resetAudioMenu() {
+  const list = document.getElementById('ytAudioOptions');
+  const btn = document.getElementById('ytAudioBtn');
+  const label = document.getElementById('ytAudioText');
+  if (btn) btn.classList.remove('has-multiple-audio');
+  if (label) label.innerText = 'AUDIO';
+  currentAudioTrackIndex = -1;
+  availableAudioTracks = [];
+  if (!list) return;
+  list.innerHTML = `
+    <div class="yt-audio-item active" onclick="setAudioTrack(-1, 'Default')">
+      <span class="yt-check">✓</span>
+      <span>Default Audio</span>
+    </div>
+  `;
+}
+
+function populateAudioMenu(tracks) {
+  const list = document.getElementById('ytAudioOptions');
+  const btn = document.getElementById('ytAudioBtn');
+  const label = document.getElementById('ytAudioText');
+  if (!list || !tracks || tracks.length === 0) return;
+
+  availableAudioTracks = tracks;
+
+  if (tracks.length > 1) {
+    if (btn) btn.classList.add('has-multiple-audio');
+  } else {
+    if (btn) btn.classList.remove('has-multiple-audio');
+  }
+
+  list.innerHTML = '';
+  tracks.forEach((t, idx) => {
+    const rawLang = (t.lang || '').toLowerCase();
+    const langLabel = LANG_MAP[rawLang] || t.name || `Audio ${idx + 1}`;
+    const displayTitle = (t.name && t.name !== langLabel && !t.name.toLowerCase().startsWith('audio'))
+      ? `${langLabel} (${t.name})`
+      : langLabel;
+
+    const isCurrent = (currentAudioTrackIndex === t.id) || (currentAudioTrackIndex === -1 && (t.default || idx === 0));
+    if (isCurrent && label) {
+      label.innerText = langLabel.toUpperCase().substring(0, 4);
+    }
+
+    const item = document.createElement('div');
+    item.className = `yt-audio-item ${isCurrent ? 'active' : ''}`;
+    item.id = `audio-track-${t.id}`;
+    item.onclick = (e) => {
+      e.stopPropagation();
+      setAudioTrack(t.id, langLabel);
+    };
+    item.innerHTML = `
+      <span class="yt-check">✓</span>
+      <span>${displayTitle}</span>
+    `;
+    list.appendChild(item);
+  });
+}
+
+function setAudioTrack(trackId, label) {
+  if (currentHls) {
+    currentHls.audioTrack = trackId;
+  }
+  const video = document.getElementById('players');
+  if (video && video.audioTracks) {
+    for (let i = 0; i < video.audioTracks.length; i++) {
+      video.audioTracks[i].enabled = (i === trackId);
+    }
+  }
+
+  currentAudioTrackIndex = trackId;
+  const labelEl = document.getElementById('ytAudioText');
+  if (labelEl) labelEl.innerText = label.toUpperCase().substring(0, 4);
+
+  const items = document.querySelectorAll('.yt-audio-item');
+  items.forEach(it => it.classList.remove('active'));
+  const activeEl = document.getElementById(`audio-track-${trackId}`);
+  if (activeEl) activeEl.classList.add('active');
+
+  toggleAudioDropdown(false);
+  showToast(`🎧 Audio language switched to: ${label}`);
+}
+
+function updateActiveAudioTrackUI(trackId) {
+  currentAudioTrackIndex = trackId;
+  const items = document.querySelectorAll('.yt-audio-item');
+  items.forEach(it => it.classList.remove('active'));
+  const activeEl = document.getElementById(`audio-track-${trackId}`);
+  if (activeEl) activeEl.classList.add('active');
+}
+
+function toggleAudioDropdown(forceState) {
+  const dropdown = document.getElementById('ytAudioDropdown');
+  if (!dropdown) return;
+  const isShow = forceState !== undefined ? forceState : !dropdown.classList.contains('show');
+  if (isShow) {
+    toggleQualityDropdown(false);
+    dropdown.classList.add('show');
+  } else {
+    dropdown.classList.remove('show');
+  }
 }
 
 // --- 3. YOUTUBE PLAYER CONTROLS (PLAY, VOLUME, FULLSCREEN, PiP) ---
@@ -877,6 +1017,7 @@ window.addEventListener('DOMContentLoaded', () => {
   const muteBtn = document.getElementById('ytMuteBtn');
   const volRange = document.getElementById('ytVolRange');
   const qualityBtn = document.getElementById('ytQualityBtn');
+  const audioBtn = document.getElementById('ytAudioBtn');
 
   if (video) {
     video.addEventListener('playing', hideStandbyOverlay);
@@ -898,6 +1039,7 @@ window.addEventListener('DOMContentLoaded', () => {
   if (muteBtn) muteBtn.onclick = (e) => { e.stopPropagation(); toggleMute(); };
   if (volRange) volRange.oninput = (e) => { e.stopPropagation(); setVolume(parseFloat(e.target.value)); };
   if (qualityBtn) qualityBtn.onclick = (e) => { e.stopPropagation(); toggleQualityDropdown(); };
+  if (audioBtn) audioBtn.onclick = (e) => { e.stopPropagation(); toggleAudioDropdown(); };
 
   if (vp) {
     vp.onclick = (e) => {
@@ -917,6 +1059,9 @@ window.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('click', (e) => {
     if (!e.target.closest('.yt-quality-container')) {
       toggleQualityDropdown(false);
+    }
+    if (!e.target.closest('.yt-audio-container')) {
+      toggleAudioDropdown(false);
     }
   });
 

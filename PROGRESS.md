@@ -197,8 +197,18 @@
        - Integrated automated helper overlay displaying:
          - `▶ Play in VLC (1-Click)`: Generates and downloads a `.m3u` playlist file and triggers `vlc://` URL protocol handler for immediate VLC playback.
          - `📺 Cast to TV`: Streams directly to nearby TV screen.
-     - **80 Channels Synced to Google Sheet**: All 80 channels updated to `Live` in Google Sheet and local playlist. 71 channels play directly in browser up to 1080p Full HD; all 80 supported via 1-Click VLC and TV Casting.
-     - **Live Verification on PythonAnywhere**: Deployed and verified via automated Selenium test suite (`live_cast_and_cinema_standby.png`, `live_sony_pix_vlc_cast_overlay.png`, `live_stream_playing_cinema_cast.png`). All tests passed with Status 200.
+      - **80 Channels Synced to Google Sheet**: All 80 channels updated to `Live` in Google Sheet and local playlist. 71 channels play directly in browser up to 1080p Full HD; all 80 supported via 1-Click VLC and TV Casting.
+      - **Live Verification on PythonAnywhere**: Deployed and verified via automated Selenium test suite (`live_cast_and_cinema_standby.png`, `live_sony_pix_vlc_cast_overlay.png`, `live_stream_playing_cinema_cast.png`). All tests passed with Status 200.
+   - **Google Sheet Stream Audit & Real-Time Multi-Audio Track Switcher Integration**:
+     - **Stream Status Audit & Sync**:
+       - Conducted full automated audit across all 80 streams in Google Sheet: 77 streams verified LIVE and broadcasting; 3 streams marked DEAD (`Madha TV` timeout, `YET Max` 404, `YET TV` 404).
+       - Updated Google Sheet via Google Apps Script Webhook (Status 200) and synced local `05_STREAMING_PORTAL/IPTV_Playlist_Merged_Primary.csv`.
+     - **Dynamic Audio Track / Multi-Language Engine**:
+       - Added `#ytAudioBtn` with headphone icon and dynamic 4-letter language badge (`AUDIO`, `TAM`, `ENGL`, `HIN`, `TEL`, etc.) in the player control bar.
+       - Added `#ytAudioDropdown` popup menu with checkmarks and dark glass UI.
+       - Integrated `Hls.Events.AUDIO_TRACKS_UPDATED` and `Hls.Events.AUDIO_TRACK_SWITCHED` with `hls.audioTrack = trackId` for real-time, non-blocking track changes without rebuffering.
+       - Configured `.has-multiple-audio` emerald highlight badge when multiple tracks exist and toast notifications upon track switch (`🎧 Audio language switched to: ...`).
+     - **Live Verification on PythonAnywhere**: Deployed to `sathishkumar890.pythonanywhere.com` and verified via automated Selenium test suite (`live_audio_selector_open.png`, `live_audio_selector_active.png`, `live_stream_with_audio_controls.png`). All tests passed with Status 200.
 
 ---
 
