@@ -23,3 +23,7 @@ Thumbs.db
 05_STREAMING_PORTAL/*remote*
 *BACKUP*.xlsx
 *backup*.xlsx
+*.wav
+*.mp4
+05_STREAMING_PORTAL/audio_samples/
+
