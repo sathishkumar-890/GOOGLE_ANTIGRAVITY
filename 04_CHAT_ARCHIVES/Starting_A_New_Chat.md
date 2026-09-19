@@ -1,8 +1,8 @@
 # Chat Archive: Starting A New Chat
 
 - **Conversation ID**: `7f2dd70d-8dac-443f-87a4-db0069ebd5e1`
-- **Last Modified**: 2026-09-19 10:45:10.7587565+00:00
-- **Total Messages**: 177
+- **Last Modified**: 2026-09-19 10:50:16.5909306+00:00
+- **Total Messages**: 181
 
 ---
 
@@ -2402,4 +2402,172 @@ still i can see 182 rows in sheet 2 remove duplicate and update the status live 
 I am checking the sheet permissions and access mode...
 
 ---
+
+### 🤖 Antigravity Agent:
+The reason **Sheet 2** still showed 182 rows in your browser is that the existing Google Apps Script webhook was previously coded with `sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet()`. Because `IPTV_Playlist` is the default active sheet, the webhook updated Sheet 1 (which is now clean at 78 Live channels), but could not switch tabs to `Sheet 2`.
+
+To immediately update **Sheet 2** in your Google Sheet (removing all 53 duplicate rows and color-coding all 129 unique streams to Live/Dead), choose **Option 1 (Fastest: 1-Click Script)** or **Option 2 (File Import)**:
+
+---
+
+### Option 1: Instant 1-Click Apps Script Run (Recommended — Takes 10 Seconds)
+
+We generated a ready-to-run script containing all 129 unique, verified streams:
+
+1. Open your [Google Sheet](https://docs.google.com/spreadsheets/d/1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc/edit).
+2. Click **Extensions** > **Apps Script** in the top menu bar.
+3. In the left panel, click **`+`** (Add a file) > **Script**, and name it `UpdateSheet2`.
+4. Replace any text in the editor with the code below and click **Save** (💾):
+
+```javascript
+function updateAndDeduplicateSheet2() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sheet = ss.getSheetByName('Sheet2');
+  if (!sheet) {
+    sheet = ss.insertSheet('Sheet2');
+  }
+  
+  // Read full cleaned dataset from file or paste directly:
+  // (Full script with all 129 unique rows is ready in your repository)
+}
+```
+> [!TIP]
+> The complete self-contained script with all 129 unique rows already embedded is saved locally at:  
+> [`05_STREAMING_PORTAL/Update_Sheet2_Script.gs`](file:///c:/Users/User/Documents/antigravity/joyful-turing/05_STREAMING_PORTAL/Update_Sheet2_Script.gs)  
+> Just copy the entire content of that file, paste it into the editor, and click the **Run (▶)** button at the top!
+
+5. Click the **Run** (▶) button at the top of the Apps Script window.
+   - It will execute in ~2 seconds.
+   - Refresh your Google Sheet: **Sheet 2 is immediately replaced with exactly 129 unique rows** (all 53 duplicates gone, 103 Live in green, 26 Dead in red, and styled headers).
+
+---
+
+### Option 2: Direct CSV Import (5 Seconds)
+
+If you prefer not to touch Apps Script, you can import the clean CSV directly into Sheet 2:
+
+1. In your [Google Sheet](https://docs.google.com/spreadsheets/d/1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc/edit), click on the **`Sheet2`** tab at the bottom.
+2. Click **File** > **Import**.
+3. Click the **Upload** tab > **Browse**.
+4. Select the cleaned file:  
+   `c:\Users\User\Documents\antigravity\joyful-turing\05_STREAMING_PORTAL\Sheet2_Deduplicated_Updated.csv`
+5. For *Import location*, choose **"Replace current sheet"** and click **Import data**.
+
+---
+
+### Summary of What Changes in Sheet 2:
+- **Total Rows**: Drops from 182 rows down to **129 unique rows**.
+- **Duplicates Removed**: **53 duplicate URLs removed**.
+- **Live Streams**: **103 streams** marked `Live` in soft green (`#dcfce7`).
+- **Dead Streams**: **26 streams** marked `Dead` in soft red (`#fee2e2`) (including `Oli TV` and `YET TV` moved from Sheet 1).
+
+---
+
+### 👤 User:
+can you do this job i gave you access right
+
+### 🤖 Antigravity Agent:
+I want to be 100% transparent with you:
+
+You are completely right — you gave me the Webhook access (`https://script.google.com/macros/s/.../exec`) to edit your Google Sheet directly. That is **exactly how I updated Sheet 1 (`IPTV_Playlist`)** a few moments ago (cleaning it to 78 100% Live channels and removing the 2 dead ones).
+
+### Why Sheet 2 Did Not Update Yet:
+The script currently deployed inside your Google Apps Script was created in our earlier chat with this line:
+```javascript
+var sheet = SpreadsheetApp.getActiveSpreadsheet().getActiveSheet();
+```
+When Google receives a request from an external webhook in the background, Google's server **always defaults `getActiveSheet()` to the very first tab (`IPTV_Playlist`)**. Because that script does not check `data.sheetName`, Google rejects switching tabs to `Sheet2`. 
+
+Google's security does not allow an external API to rewrite its own backend server code — only you, as the Google account owner, can update that script.
+
+---
+
+### How We Can Fix This in 10 Seconds:
+
+#### Option 1: Update the Script Once (I will run the rest!)
+1. In your [Google Sheet](https://docs.google.com/spreadsheets/d/1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc/edit), click **Extensions** > **Apps Script**.
+2. Replace all the code in `IPTV_Sync.gs` with this upgraded version that supports both tabs:
+
+```javascript
+function doGet(e) {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  return ContentService.createTextOutput(JSON.stringify({
+    status: "online",
+    sheet: ss.getActiveSheet().getName()
+  })).setMimeType(ContentService.MimeType.JSON);
+}
+
+function doPost(e) {
+  var lock = LockService.getScriptLock();
+  lock.tryLock(15000);
+  
+  try {
+    var data = JSON.parse(e.postData.contents);
+    var ss = SpreadsheetApp.getActiveSpreadsheet();
+    
+    // Allows targeting Sheet2 or IPTV_Playlist
+    var sheet = data.sheetName ? ss.getSheetByName(data.sheetName) : ss.getActiveSheet();
+    if (!sheet) sheet = ss.getActiveSheet();
+    
+    if (data.action === "sync_all") {
+      var rows =
+<truncated 83 bytes>
+     sheet.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+        
+        sheet.getRange(1, 1, 1, rows[0].length)
+             .setBackground("#1e293b")
+             .setFontColor("#ffffff")
+             .setFontWeight("bold");
+        
+        for (var i = 1; i < rows.length; i++) {
+          var statusCell = sheet.getRange(i + 1, 5);
+          var val = String(rows[i][4]).trim();
+          if (val === "Live") {
+            statusCell.setBackground("#dcfce7").setFontColor("#15803d").setFontWeight("bold");
+          } else if (val === "Dead") {
+            statusCell.setBackground("#fee2e2").setFontColor("#b91c1c");
+          }
+        }
+      }
+      return ContentService.createTextOutput(JSON.stringify({
+        status: "success",
+        sheet: sheet.getName(),
+        updatedRows: rows.length
+      })).setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: "Unknown action"
+    })).setMimeType(ContentService.MimeType.JSON);
+    
+  } catch (err) {
+    return ContentService.createTextOutput(JSON.stringify({
+      status: "error",
+      message: err.toString()
+    })).setMimeType(ContentService.MimeType.JSON);
+  } finally {
+    lock.releaseLock();
+  }
+}
+```
+3. Click **Save** (💾).
+4. Click **Deploy** > **Manage deployments** > Click **Edit** (✏️) > Select **Version: New version** > Click **Deploy**.
+5. Reply **"DONE"** here — **I will immediately trigger the webhook to deduplicate Sheet 2 and update all 129 rows automatically!**
+
+---
+
+#### Option 2: 5-Second Direct File Import (Zero Script Editing)
+If you don't want to touch Apps Script:
+1. In Google Sheets, click the **`Sheet2`** tab.
+2. Click **File** > **Import** > **Upload** > browse to:
+   `c:\Users\User\Documents\antigravity\joyful-turing\05_STREAMING_PORTAL\Sheet2_Deduplicated_Updated.csv`
+3. Select **"Replace current sheet"** and click **Import data**.
+
+Let me know once you've saved Option 1 so I can immediately execute the sync for you!
+
+---
+
+### 👤 User:
+done for option 1
 
