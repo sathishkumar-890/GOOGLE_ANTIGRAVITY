@@ -273,6 +273,14 @@
         - `05_STREAMING_PORTAL/Google_Sheet_Complete_Cleaned.xlsx`: Master dual-tab Excel workbook with styled dark headers (`#1e293b`), green live badges (`#dcfce7`), and red dead badges (`#fee2e2`).
         - `05_STREAMING_PORTAL/IPTV_Sync_Enhanced.gs`: Enhanced Apps Script supporting multi-sheet targeting (`sheetName: "Sheet2"`) and 1-click UI menu.
       - **Deployed to PythonAnywhere**: Synced `IPTV_Playlist_Merged_Primary.csv` and reloaded PythonAnywhere web app. All automated Selenium verification tests passed.
+    - **Cross-Sheet Comparison & Overlap Elimination (Sheet 1 vs Sheet 2)**:
+      - Compared all 78 stream rows in `IPTV_Playlist` against all 129 rows in `Sheet2`.
+      - Identified and removed all **77 overlapping streams** from `Sheet2` (76 exact URL matches + 1 HTTP duplicate `Sivan TV`).
+      - Updated `Sheet2` directly in live Google Sheets via Webhook `sync_all` with `sheetName: "Sheet2"`.
+      - **Current Google Sheet Live State**:
+        - **`IPTV_Playlist` (Sheet 1)**: Exactly **78 streams** (100% Live, 0 Dead).
+        - **`Sheet2`**: Exactly **52 unique streams** (0 overlap with Sheet 1, 26 Live, 26 Dead).
+      - Master datasets updated: `05_STREAMING_PORTAL/Sheet2_Non_Overlapping.csv` and `Google_Sheet_Complete_Cleaned.xlsx`.
 
 ---
 

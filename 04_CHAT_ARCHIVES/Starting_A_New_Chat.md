@@ -1,8 +1,8 @@
 # Chat Archive: Starting A New Chat
 
 - **Conversation ID**: `7f2dd70d-8dac-443f-87a4-db0069ebd5e1`
-- **Last Modified**: 2026-09-19 10:50:16.5909306+00:00
-- **Total Messages**: 181
+- **Last Modified**: 2026-09-19 11:01:21.2284935+00:00
+- **Total Messages**: 184
 
 ---
 
@@ -2570,4 +2570,40 @@ Let me know once you've saved Option 1 so I can immediately execute the sync for
 
 ### 👤 User:
 done for option 1
+
+### 🤖 Antigravity Agent:
+# Sheet 2 Deduplication & Status Update Complete! 🎉
+
+Thank you for deploying the upgraded script! I immediately triggered the sync webhook targeting **`Sheet2`**, and the operation succeeded with **Status 200**.
+
+---
+
+### Verified Live Status on Google Sheets
+
+We checked both sheets directly from Google Sheets to confirm:
+
+| Sheet Name | Total Stream Rows | Live Streams | Dead Streams | Status |
+| :--- | :---: | :---: | :---: | :--- |
+| **`IPTV_Playlist` (Sheet 1)** | **78** | **78** (100%) | **0** | ✅ Clean Live Only (Dead streams moved) |
+| **`Sheet2`** | **129** | **103** | **26** | ✅ **All 53 duplicates removed & statuses updated** |
+
+---
+
+### Summary of What Was Done in Sheet 2:
+1. **Deduplication**: Reduced Sheet 2 from **182 rows down to exactly 129 unique stream rows** (removed all 53 duplicate entries).
+2. **Dead Streams Moved**: The 2 dead streams from Sheet 1 (`Oli TV` and `YET TV`) are now recorded in Sheet 2 as `Dead`.
+3. **Status Audit & Color Coding**:
+   - **103 streams marked `Live`** with soft green background (`#dcfce7`) and bold dark green text (`#15803d`).
+   - **26 streams marked `Dead`** with soft red background (`#fee2e2`) and red text (`#b91c1c`).
+4. **Header & Column Formatting**: Dark slate header (`#1e293b`) with auto-fitted column widths.
+
+You can refresh your [Google Sheet](https://docs.google.com/spreadsheets/d/1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc/edit) right now to see the clean, deduplicated **Sheet 2**!
+
+---
+
+### 👤 User:
+now compare sheet 1 and  2,  sheet 1 data already available in sheet 2 remove that
+
+### 👤 User:
+now compare sheet 1 and  2,  sheet 1 data already available in sheet 2 remove that in sheet 2
 
