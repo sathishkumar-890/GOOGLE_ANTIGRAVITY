@@ -92,8 +92,7 @@ def main():
 
     header_fill = PatternFill(start_color="1E293B", end_color="1E293B", fill_type="solid")
     header_font = Font(name="Segoe UI", size=11, bold=True, color="FFFFFF")
-    live_fill = PatternFill(start_color="DCFCE7", end_color="DCFCE7", fill_type="solid")
-    live_font = Font(name="Segoe UI", size=10, bold=True, color="15803D")
+    live_font = Font(name="Segoe UI", size=10, bold=False, color="000000")
     dead_fill = PatternFill(start_color="FEE2E2", end_color="FEE2E2", fill_type="solid")
     dead_font = Font(name="Segoe UI", size=10, bold=False, color="B91C1C")
 
@@ -109,7 +108,7 @@ def main():
                 else:
                     if c_idx == 5:
                         if val == "Live":
-                            cell.fill = live_fill
+                            # No highlight: clean regular text, no background fill
                             cell.font = live_font
                         else:
                             cell.fill = dead_fill

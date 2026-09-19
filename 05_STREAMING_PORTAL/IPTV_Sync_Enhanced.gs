@@ -56,7 +56,8 @@ function doPost(e) {
           var statusCell = sheet.getRange(i + 1, 5);
           var val = String(rows[i][4]).trim();
           if (val === "Live") {
-            statusCell.setBackground("#dcfce7").setFontColor("#15803d").setFontWeight("bold");
+            // REMOVE GREEN HIGHLIGHT: Clean, no background, standard black text
+            statusCell.setBackground(null).setFontColor("#000000").setFontWeight("normal");
           } else if (val === "Dead") {
             statusCell.setBackground("#fee2e2").setFontColor("#b91c1c");
           }
@@ -83,7 +84,7 @@ function doPost(e) {
             var statusCell = sheet.getRange(i + 2, 5);
             statusCell.setValue(newStatus);
             if (newStatus === "Live") {
-              statusCell.setBackground("#dcfce7").setFontColor("#15803d").setFontWeight("bold");
+              statusCell.setBackground(null).setFontColor("#000000").setFontWeight("normal");
             } else {
               statusCell.setBackground("#fee2e2").setFontColor("#b91c1c");
             }
@@ -147,7 +148,7 @@ function cleanAndFormatSheet2() {
     var cell = sheet.getRange(j + 2, 5);
     var status = String(uniqueRows[j][4]).trim();
     if (status === "Live") {
-      cell.setBackground("#dcfce7").setFontColor("#15803d").setFontWeight("bold");
+      cell.setBackground(null).setFontColor("#000000").setFontWeight("normal");
     } else if (status === "Dead") {
       cell.setBackground("#fee2e2").setFontColor("#b91c1c");
     }
