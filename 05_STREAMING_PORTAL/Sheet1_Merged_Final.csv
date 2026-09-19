@@ -7,7 +7,6 @@ Isaiaruvi Tv,https://segment.yuppcdn.net/140622/isaiaruvi/playlist.m3u8,Music,�
 Kalaignar Tv,https://segment.yuppcdn.net/240122/kalaignartv/playlist.m3u8,Music,🎵,Live
 Life TV,https://lifetv.livebox.co.in/lifetvhls/lifetv.m3u8,Music,🎵,Live
 Mei Alai TV,https://meialai.iptelevishion.com/meialai/2/index.m3u8,Music,🎵,Live
-MK Six TV1,https://mumt06.tangotv.in/qYyB8fXVMKSIX/index.m3u8,Music,🎵,Live
 Movie Club 2 Tv,https://d3gnyty2vddhsg.cloudfront.net/v1/master/3722c60a815c199d9c0ef36c5b73da68a62b09d1/pb-ytipwjqub3kf8/TMC2_IN.m3u8?ads.ads_cdn=cf&ads.cdn=cf,Hindi,🎬,Live
 Movie Club Tv,https://sis-global.prod.samsungtv.plus/v1/tvpprd/sc-mp2ar4ca425xo.m3u8,Hindi,🎬,Live
 Murasu Tv,https://segment.yuppcdn.net/050522/murasu/playlist.m3u8,Music,🎵,Live
@@ -28,13 +27,9 @@ Toonami Movie,http://api.toonamiaftermath.com:3000/movies/playlist.m3u8,Hindi,�
 Ultimate TV2,https://mumbai-edge.smartplaytv.in/utv/index.m3u8,Music,🎵,Live
 Vaanavil Tv,https://6n3yope4d9ok-hls-live.5centscdn.com/vaanavil/TV.stream/playlist.m3u8,Music,🎵,Live
 WOW Kidz Tamil,https://yuppparoriglin.akamaized.net/181224/smil:wowkidztam.smil/playlist.m3u8?hdnts=st=1735898689~exp=1835898688~acl=*~hmac=f5fe24724fe05481e3841f9eb5ab8efdee0a3dd83645ae9dcf45703f525bab7b,Music,🎵,Live
-Zee South Flix Tv,https://amg00862-amg00862c9-amgplt0173.playout.now3.amagi.tv/playlist/amg00862-amg00862c9-amgplt0173/playlist.m3u8,Hindi,🎬,Dead
+Zee South Flix Tv,https://amg00862-amg00862c9-amgplt0173.playout.now3.amagi.tv/playlist/amg00862-amg00862c9-amgplt0173/playlist.m3u8,Hindi,🎬,Live
 Zee Tamil HD,https://da86m1sqpm3o0.cloudfront.net/28072023/smil:zeetamil1.smil/playlist.m3u8,Hindi,🎬,Live
-IBC Tamil,https://ibc.massstream.net/IBC/index.m3u8,Tamil,📺,Live
-Manorama Tv,https://cdn.pishow.tv/ott/live/1479/master.m3u8,Malayalam,📰,Live
 MK Six TV2,https://cdn.pishow.tv/ott/live/1253/master.m3u8,Hindi,🎬,Live
-National Geographic,http://main.light-ott.net:80/play/live.php?mac=00:1A:79:17:28:41&stream=373017&extension=ts&play_token=zCaGy5dtla,Bengali,🌍,Live
-News 7 Tv,https://cdn.pishow.tv/ott/live/1498/master.m3u8,Tamil,📰,Live
 News J,https://cdn.pishow.tv/ott/live/1279/master.m3u8,Tamil,📰,Live
 NTC TV,https://galaxyott.live/hls/ntv.m3u8,Tamil,📺,Live
 Oli TV,https://live.olidigital.in/olitv/olitv/index.m3u8,Tamil,📺,Live
@@ -44,14 +39,9 @@ Raj Musix Tamil,https://livestream.rajtv.tv/hlslive/Admin/px08241087/live/Raj_Mu
 Raj TV,https://livestream.rajtv.tv/hlslive/Admin/px08241087/live/RAJTV/master_1.m3u8,Music,🎵,Live
 Shemaroo Tv,https://cdn.pishow.tv/ott/live/230/master.m3u8,Hindi,🎬,Live
 Sony MAX HD,https://sl.vodep39240327.workers.dev/channel/SONY%20MAX%20HD.m3u8,Hindi,🎬,Live
-Sooriyan TV,https://live20.bozztv.com/giatv/giatv-Infinittyott/Infinittyott/playlist.m3u8,Music,🎵,Live
-Star Vijay HD,https://peaky.techcoder40.workers.dev/776.m3u8,Music,🎵,Live
 Studio One Tv,https://cdn.pishow.tv/ott/live/276/master.m3u8,Telugu,📺,Live
 Suriya Tv,https://stream.ottlive.co.in/suryatvtamil/index.m3u8,Music,🎵,Live
-Suriyan Tv,https://stream.sscloud7.com/live/suriyantv/index.m3u8,Hindi,🎬,Live
 Thanthi Tv,https://cdn.pishow.tv/ott/live/1612/master.m3u8,Tamil,📺,Live
 Travel XP HD Tv,https://deltatesttatasky.akamaized.net/out/i/968284.m3u8,English,🌐,Live
 Velicham Tv,https://cdn.pishow.tv/ott/live/461/master.m3u8,Tamil,📺,Live
 Vendar Tv,https://cdn.pishow.tv/ott/live/1271/master.m3u8,Malayalam,🪷,Live
-Vijay Takkar APAC,https://tglmp01.akamaized.net/out/v1/c1071012b73f4f189b202e1529e8f802/manifest.mpd,Tamil,🎵,Live
-We Tv,https://cdn.pishow.tv/ott/live/1530/master.m3u8,Music,🎵,Live

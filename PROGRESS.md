@@ -334,6 +334,26 @@
         - Category filters populated accurately based on acoustic audio analysis: `All (56)`, `Music (27)`, `Hindi (13)`, `Tamil (11)`, `Malayalam (2)`, `Bengali (1)`, `Telugu (1)`, `English (1)`.
         - Verified `MK Six TV1` and `MK Six TV2` rendered as separate cards in the portal playlist.
         - Verified live streaming playback in headless Chrome with screenshot proof (`portal_live_56_full.png`, `mk_six_tv1_playing.png`).
+    - **Sheet 1 Visual Stream Audit & Dead Stream Migration to Sheet 2**:
+      - **Objective**: Conduct visual stream audit (video frame decoding verification via ffmpeg/ffprobe) across all Sheet 1 streams, identify dead streams, move dead streams to Sheet 2, update only text (0 green highlights), and synchronize.
+      - **Audit Findings (56 streams checked)**:
+        - **46 Verified LIVE Streams**: Successfully decoded visual video frames (resolutions: 1920x1080, 1280x720, 1024x576, 720x576, 640x360, 448x360).
+        - **10 Confirmed DEAD Streams**:
+          1. `MK Six TV1` (HTTP 404)
+          2. `IBC Tamil` (Unreachable / Offline)
+          3. `Manorama Tv` (Connection / Read Timeout)
+          4. `National Geographic` (Connection Timeout)
+          5. `News 7 Tv` (Connection Timeout)
+          6. `Sooriyan TV` (Read Timeout)
+          7. `Star Vijay HD` (HTTP 403 / Connect Timeout)
+          8. `Suriyan Tv` (Unreachable / Connect Timeout)
+          9. `Vijay Takkar APAC` (Connection Timeout)
+          10. `We Tv` (Empty segments / Stream Dropped)
+      - **Migration & Dataset Updates (Text-Only, Zero Highlights)**:
+        - **Sheet 1 (`IPTV_Playlist`)**: 46 verified Live channels (47 rows with header), 0 dead channels.
+        - **Sheet 2 (`Sheet2`)**: 33 confirmed Dead channels (34 rows with header), including the 10 moved streams.
+        - Updated datasets: `Sheet1_Merged_Final.csv`, `Sheet2_Dead_Only.csv`, `IPTV_Playlist_Merged_Primary.csv`, and `Google_Sheets_Complete_Master.xlsx`.
+        - Synchronized to Google Sheets via Webhook (Sheet 1: 47 rows, Sheet 2: 34 rows). All status text updated without green highlighting.
 
 ---
 
