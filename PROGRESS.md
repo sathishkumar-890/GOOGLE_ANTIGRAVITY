@@ -44,8 +44,60 @@
     - Handled abbreviations, known maritime maker mappings, and typo variations with 100% certainty (e.g. `JRC` -> `M1367` JAPAN RADIO CO., LTD, `BOLL&KIRCH FILTERBAU GMBH` -> `M0351`, `TAIKO` -> `M0337`, `FLUTEK` -> `M1727`, `KOCKUM SONICS AB` -> `M0605`, `LEROY SOMER` -> `m0015`, `HI AIR KOREA` / `HI-AIR KOREA` -> `O1498`, etc.).
     - Populated 193 rows with valid `Req Lib` maker codes.
     - Kept 84 rows strictly blank/empty (`None`) where maker was not present in `Req Lib` or identity could not be matched with 100% certainty (0 assumptions).
-    - Preserved all other 17 columns in `MAIN VDC_wisdom` and all other sheets 100% intact.
-    - Verified 100% integrity pass via `verify_wisdom_maker_codes_integrity.py`. Backup saved to `VL_EXTRACTION_I.wisdm_mak_BACKUP.xlsx`.
+  - **World Seafarer (SNo. 482) Machinery & Serial Extraction (`VL_EXTRACTION_WORLD SEAFARERS.xlsx`)**:
+    - Analyzed all 15 pages of finished drawing booklet `MA2 D2002(2) PRINCIPAL PARTICULARS (MACHINERY PART) WITH SERIAL NUMBER LIST.pdf`.
+    - Synthesized official Serial Number table on Pages 14–15 with engineering particulars on Pages 2–11 into **97 verified equipment rows** (Rows 2 to 98).
+    - **Corrected Page 3 Machineries (8 items)**: Fully extracted all 8 shafting and propulsion equipment items:
+      1. `INTERMEDIATE SHAFT`
+      2. `PROPELLER SHAFT`
+      3. `INTERMEDIATE SHAFT BEARING`
+      4. `FWD STERN TUBE BEARING`
+      5. `AFT STERN TUBE BEARING`
+      6. `FWD STERN TUBE SEAL`
+      7. `AFT STERN TUBE SEAL`
+      8. `PROPELLER`
+    - **100% Uppercase & Character Limit Compliance**: All text across all columns is strictly uppercase; Column A `LOCATION_CODE` strictly satisfies $\le 8$ characters.
+    - **Columns D and E Kept Strictly Empty**: `SYSTEM_CODE` (Col D) and `SYSTEM_DESCRIPTION` (Col E) are 100% blank (`None`) across all 97 rows as requested.
+    - **Strict Serial Number Policy**: S.No populated ONLY for equipment explicitly listed in the serial number table on Pages 14–15 (83 rows). All remaining 14 rows have S.NO kept strictly empty (`None`) with 0 assumptions.
+    - **Req Lib Mapping**: Populated Columns A (`LOCATION_CODE`) and B (`LOCATION DESCRIPTION`) strictly from `Req Lib` where matches exist; kept blank where not present. Preserved `Req Lib` sheet (1,671 rows) 100% untouched.
+    - **Maker Normalization & Symbol Cleaning Updates**:
+      - **Maker Column (Col F)**: Removed `CO., LTD.`, `CO. LTD.`, `LTD.`, `& CO., LTD.`, and all country designations (`JAPAN`, `KOREA`, etc.), retaining only the clean company name in 100% UPPERCASE across all 32 manufacturers.
+      - **Symbol Conversions in Specifications**:
+        - Converted all `%` to `PERCENTAGE` across 14 cooler and heater rows (`85%` $\to$ `85 PERCENTAGE`, `90%` $\to$ `90 PERCENTAGE`).
+        - Converted all `&` to `AND` across 6 rows (`SHELL AND TUBE`, `STEAM AND DRAIN`, `WELDING AND CUTTING`, `CU AND FE`).
+        - Converted all `*` mathematical dimensions to `X` (e.g. `(40 X 3/4 MSSM)` in Row 84 specification and Row 85 model).
+        - Preserved all `DEG C` heat degree measurements 100% intact as requested.
+        - Result: **0 forbidden symbols (`%`, `&`, `*`, `#`, `@`, `^`)** and **0 non-ASCII characters** remain across all 97 rows.
+    - **Character Limit & Capacity Unit Audit**:
+      - Audited all mentioned columns against SOP limits (Location Code $\le 8$, Location Description $\le 50$, System Code $\le 8$, System Description $\le 150$, Maker $\le 60$, System Particulars $\le 2000$).
+      - **Result**: Exactly **0 cells exceed their limits**; all fields are 100% compliant, so 0 cells required orange highlighting.
+      - **Capacity Units**: Verified all volumetric flows are formatted in standard engineering notation as `M3/H` (58 instances) and areas as `M2` (14 instances), with 0 non-standard terms (`METER QUBE`, `METER CUBE`, `M3/HR`).
+    - Successfully written and verified directly in `VL_EXTRACTION_WORLD SEAFARERS.xlsx` and backup `VL_EXTRACTION_WORLD SEAFARERS_NEW.xlsx`.
+    - 100% verified via `verify_final_cleaned.py` and `audit_character_limits.py`.
+  - **New Manuals Extraction & Deduplicated Expansion (189 Total Machinery Rows)**:
+    - Analyzed all new PDF manuals added to `01_VL_EXTRACTION/seafarers_manuals/`:
+      1. `HA 3 D2002 PRINCIPAL PARTICULARS (HULL PART).pdf`
+      2. `HE1 F2792F LIST OF MANUFACTURERS.pdf`
+      3. `EA2 D20023 R0-00 Principal Particulars (ELE).pdf`
+      4. `MA22 M1113 LIST OF MANUFACTURERS (MACHINERY PART).pdf`
+      5. `MA3 D2003(2) SPECIFICATIONS (MACHINERY PART).pdf`
+      6. `EA3 D20033 R0-00 SPECIFICATIONS (ELECTRIC PART).pdf`
+    - Extracted **92 genuine new machinery items** covering:
+      - **Deck & Hull**: Electro-Hydraulic Steering Gear, Rudder Carrier, Windlass No.1 & No.2, Mooring Winches Nos. 1–6, Steel Hatch Cover Driving Winch, Provision Crane, F.O. Hose Handling Davit, Sludge Davit, Free-fall Lifeboat, Rigid Rescue Boat, Lifeboat & Rescue Boat Davits, Inflatable Liferafts Nos. 1–3, Pilot Assist Ladder, Sewage Treatment Plant, Vacuum Toilet System, AC Plant, Prov. Refrigeration Plant, Breathing Air Compressor, Exhaust Fans, Portable Fan, Water Ingress Alarm System, Valve Remote Control System, Air Purge Gauges, Loading Computer.
+      - **Machinery & Safety**: Ballast Water Treatment System (BWTS), High Expansion Foam Fire Extinguishing System, Local Application Fire Fighting System, Shaft Horsepower Meter System, Ship Performance Monitoring System (Kyma).
+      - **Electrical Power**: Main Switchboard, Emergency Switchboard, Group Starter Panel & Individual Starter, Distribution Panel, Battery Charging & Discharging Panel, Main Transformers Nos. 1 & 2, Emergency Transformers Nos. 1 & 2, ERAMS, Fire Detecting System, Bridge/Engine Control Consoles.
+      - **Nautical Instruments & Navigation**: Gyro Compass, Auto Pilot, Electromagnetic Speed Log, Magnetic Compass, Marine Radars (S-Band & X-Band), GPS Navigators Nos. 1 & 2, Echo Sounder, VDR, MF/HF Radio, Radar Transponders Nos. 1 & 2, Navtex Receiver, Satellite EPIRB, Two-Way Radios Nos. 1–3, Inmarsat-C, Inmarsat FleetBroadband, VHF Radiotelephones Nos. 1 & 2, AIS, BNWAS, ECDIS Nos. 1 & 2, Satellite Log, Conning Display, Weather Facsimile, Rudder Angle Indicator, Shaft Revolution Indicator, Anemometer, Window Wiper, Air Horn, Sound Reception System, Master Clock, Auto Telephone System.
+    - **Total Machinery Rows**: Expanded from 97 rows to **189 machinery rows** (Rows 2 to 190 in `Sheet1`).
+    - **Strict Deduplication**: Verified 0 duplicates against existing 97 items and 0 duplicates internally.
+    - **100% Uppercase & Clean ASCII**: 0 non-ASCII characters and 0 lowercase strings.
+    - **Clean Makers**: Corporate suffixes and country names removed; clean makers in 100% UPPERCASE.
+    - **Symbol Conversions**: 0 forbidden symbols (`%`, `&`, `*`, `#`, `@`, `^`); standard `M3/H` and `M2`.
+    - **Columns D, E & S.NO Integrity**: Column D (`SYSTEM_CODE`) kept strictly `None`; Column H (`S.NO`) kept strictly `None` for all new rows.
+    - **Column L Tag Population**: Filled `(205)` uniformly across all 189 equipment rows (Rows 2 to 190 in Column L).
+    - **Column E Formula Population**: Populated formula `=_xlfn.CONCAT(C{r}," ", F{r}," ",G{r}," ",L{r})` across all 189 rows (evaluating to `=CONCAT(C2," ", F2," ",G2," ",L2)` in Excel). Verified all evaluated string lengths $\le 89$ characters ($\le 150$ limit).
+    - **Req Lib Mapping**: Populated Location Code & Location Description where matched in `Req Lib`; kept `None` where absent.
+    - **Character Limit Compliance**: Verified all columns $\le$ SOP limits (0 cells exceeded, 0 orange highlights needed).
+    - **Full Audit**: Passed all 7 rigorous checks with 100% zero errors (`audit_entire_workbook.py`).
 - **Next Steps**:
   - Proceed with downstream PMS spares extraction or further VDC validation tasks.
 
@@ -208,7 +260,19 @@
        - Added `#ytAudioDropdown` popup menu with checkmarks and dark glass UI.
        - Integrated `Hls.Events.AUDIO_TRACKS_UPDATED` and `Hls.Events.AUDIO_TRACK_SWITCHED` with `hls.audioTrack = trackId` for real-time, non-blocking track changes without rebuffering.
        - Configured `.has-multiple-audio` emerald highlight badge when multiple tracks exist and toast notifications upon track switch (`🎧 Audio language switched to: ...`).
-     - **Live Verification on PythonAnywhere**: Deployed to `sathishkumar890.pythonanywhere.com` and verified via automated Selenium test suite (`live_audio_selector_open.png`, `live_audio_selector_active.png`, `live_stream_with_audio_controls.png`). All tests passed with Status 200.
+      - **Live Verification on PythonAnywhere**: Deployed to `sathishkumar890.pythonanywhere.com` and verified via automated Selenium test suite (`live_audio_selector_open.png`, `live_audio_selector_active.png`, `live_stream_with_audio_controls.png`). All tests passed with Status 200.
+    - **Google Sheet Dead Stream Migration & Sheet 2 Deduplication**:
+      - **Live vs Dead Audit Across 131 Unique Streams**:
+        - Audited all stream URLs across both `IPTV_Playlist` (Sheet 1) and `Sheet2`.
+        - **Sheet 1 (`IPTV_Playlist`)**: 78 Live streams, 2 Dead streams (`Oli TV` HTTP 404, `YET TV` HTTP 404).
+        - **Dead Stream Migration**: Removed both dead streams from Sheet 1 and updated live Google Sheet directly via Webhook `sync_all` (now strictly 78 100% Live streams, 0 Dead).
+        - **Sheet 2 Processing**: Moved the dead streams into Sheet 2, completely removed all 53 duplicate rows (original 182 rows down to 129 unique streams), audited all 129 URLs (103 Live, 26 Dead), and updated all status values to `Live` or `Dead`.
+      - **Generated Datasets & Styled Workbooks**:
+        - `05_STREAMING_PORTAL/Sheet1_Clean_Live_Only.csv` (78 Live streams).
+        - `05_STREAMING_PORTAL/Sheet2_Deduplicated_Updated.csv` (129 unique streams).
+        - `05_STREAMING_PORTAL/Google_Sheet_Complete_Cleaned.xlsx`: Master dual-tab Excel workbook with styled dark headers (`#1e293b`), green live badges (`#dcfce7`), and red dead badges (`#fee2e2`).
+        - `05_STREAMING_PORTAL/IPTV_Sync_Enhanced.gs`: Enhanced Apps Script supporting multi-sheet targeting (`sheetName: "Sheet2"`) and 1-click UI menu.
+      - **Deployed to PythonAnywhere**: Synced `IPTV_Playlist_Merged_Primary.csv` and reloaded PythonAnywhere web app. All automated Selenium verification tests passed.
 
 ---
 

@@ -1,0 +1,22 @@
+{
+  "timestamp": "2026-09-19 16:03:48",
+  "sheet1_before": 80,
+  "sheet1_after_live_only": 78,
+  "sheet1_dead_moved": 2,
+  "sheet1_dead_details": [
+    {
+      "name": "Oli TV",
+      "url": "https://live.olidigital.in/olitv/olitv/index.m3u8",
+      "reason": "HTTP Error 404"
+    },
+    {
+      "name": "YET TV",
+      "url": "https://live.yettelevision.com:5443/LiveApp/streams/yettv.m3u8",
+      "reason": "HTTP Error 404"
+    }
+  ],
+  "sheet2_before": 182,
+  "sheet2_after_dedup": 129,
+  "sheet2_live": 103,
+  "sheet2_dead": 26
+}

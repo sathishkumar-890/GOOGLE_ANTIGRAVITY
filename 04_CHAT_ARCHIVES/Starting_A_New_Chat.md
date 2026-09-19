@@ -1,8 +1,8 @@
 # Chat Archive: Starting A New Chat
 
 - **Conversation ID**: `7f2dd70d-8dac-443f-87a4-db0069ebd5e1`
-- **Last Modified**: 2026-09-19 05:33:07.4638479+00:00
-- **Total Messages**: 169
+- **Last Modified**: 2026-09-19 10:36:50.2889765+00:00
+- **Total Messages**: 174
 
 ---
 
@@ -2240,6 +2240,82 @@ Please review the [implementation plan](file:///C:/Users/User/.gemini/antigravit
 I have deployed the updated streaming portal code (with the dynamic Audio Track / Multi-Language selector, responsive dark glass styling, and Hls.js audio demuxing event hooks) to PythonAnywhere and launched the Selenium browser verification suite. 
 
 Waiting for the verification to complete...
+
+---
+
+### 🤖 Antigravity Agent:
+# Task Complete: Google Sheet Stream Audit & Multi-Audio Player Selector
+
+---
+
+### 1. Google Sheet Stream Status Audit & Sync (Completed)
+We performed an automated deep audit across all **80 streams** in the Google Sheet (`1YGz5cSLqtTw9tnHAjiNHLoT3__DHCLHcyMiGF6ElRBc`):
+- **77 Streams 100% LIVE**: Responsive, decoding HLS media playlists and video segments cleanly.
+- **3 Streams DEAD**:
+  1. `Madha TV` (`https://mumt07.tangotv.in/zHjX9OFlMADHATV/index.m3u8`): Connection timed out.
+  2. `YET Max` (`https://live.yettelevision.com:5443/LiveApp/streams/yettv2.m3u8`): HTTP 404.
+  3. `YET TV` (`https://live.yettelevision.com:5443/LiveApp/streams/yettv.m3u8`): HTTP 404.
+- **Google Sheet Synchronized**:
+  - Sent status payload directly via the Google Apps Script Webhook (`{"status":"success","message":"Statuses updated successfully"}`).
+  - Local CSV cache `05_STREAMING_PORTAL/IPTV_Playlist_Merged_Primary.csv` synchronized.
+
+---
+
+### 2. Real-Time Multi-Audio Track / Language Selector (Completed)
+Added a **YouTube / Netflix-style Audio Track Selector** to the web player control bar:
+
+1. **Headphone Control Button (`#ytAudioBtn`)**:
+   - Placed in `#ytControlsWrapper` alongside Resolution/Quality, Cast to TV, PiP, and Fullscreen.
+   - Shows the active 4-letter language code (`AUDIO`, `TAM`, `ENGL`, `HIN`, `TEL`, `MAL`, etc.).
+   - Glows in vibrant emerald (`.has-multiple-audio`) whenever a stream provides multiple alternate audio tracks.
+
+2. **Audio Track Dropdown (`#ytAudioDropdown`)**:
+   - Dark glass dropdown listing all available tracks parsed from either the HLS master manifest (`#EXT-X-MEDIA:TYPE=AUDIO`) or demuxed MPEG-TS PMT streams.
+   - Shows active checkmarks and highlights the selected track.
+
+3. **Dynamic HLS Demuxing & Switching**:
+   - Listens to `Hls.Events.AUDIO_TRACKS_UPDATED` and dynamically builds the audio options as soon as tracks are parsed.
+   - Real-time track switching (`hls.audioTrack = trackId`) without resetting the playback buffer.
+   - Listens to `Hls.Events.AUDIO_TRACK_SWITCHED` to update the active checkmark.
+   - Shows real-time toast feedback: `🎧 Audio language switched to: [Language]`.
+
+---
+
+### 3. Production Deployment & Verification Results
+- **Live URL**: [sathishkumar890.pythonanywhere.com](https://sathishkumar890.pythonanywhere.com)
+- **Deployment**: Successfully uploaded all templates, static assets, and Python backend views; web app reloaded with Status 200.
+- **Automated Verification**:
+  - `#ytAudioBtn` and `#ytAudioDropdown` verified in DOM and rendered properly.
+  - Dropdown opens on click and closes on outside clicks.
+  - Multi-audio track switching tested and verified with active badges and toasts.
+  - Live 1080p stream playback verified on Sivan TV (`currentTime: 702.03s`, resolution `1920x1080`).
+
+---
+
+### 4. Verification Screenshots
+For complete visual evidence, review the [Walkthrough Document](file:///C:/Users/User/.gemini/antigravity/brain/7f2dd70d-8dac-443f-87a4-db0069ebd5e1/walkthrough.md):
+- **Active Multi-Audio Selector**: `live_audio_selector_active.png` (Headphones icon lit up with `ENGL` badge & toast feedback).
+- **Active 1080p Playback with Audio Controls**: `live_stream_with_audio_controls.png` (Sivan TV broadcasting in pure cinema mode).
+
+All changes and chat archives have been committed and pushed to GitHub `origin main`.
+
+---
+
+### 👤 User:
+IN GOOGLE SHEET CHECK URL LIVE OR DEAD UPDATE THE STATUS AND IF DEAD STREAM ARE THERE MOVE THE ROW TO SHEET 2 IN SHEET TO WHAT ARE THE URLS ARE THERE SAME CHECK THE STATUS AND UPDATE LIVE OR DEAD REMOVE DUPLICATE IN SHEET 2
+
+### 👤 User:
+IN GOOGLE SHEET CHECK URL LIVE OR DEAD UPDATE THE STATUS AND IF DEAD STREAM ARE THERE MOVE THE ROW TO SHEET 2 IN SHEET TO WHAT ARE THE URLS ARE THERE SAME CHECK THE STATUS AND UPDATE LIVE OR DEAD REMOVE DUPLICATE IN SHEET 2
+
+### 🤖 Antigravity Agent:
+I have launched the stream reachability and audit analysis across both **Sheet 1 (`IPTV_Playlist`)** and **Sheet 2**. 
+
+The script is actively testing all unique stream URLs, identifying live vs. dead streams, preparing to move any dead streams from Sheet 1 to Sheet 2, and deduplicating Sheet 2. Waiting for the scan to finish...
+
+---
+
+### 🤖 Antigravity Agent:
+I have deployed the updated clean 78-channel playlist to PythonAnywhere and launched the Selenium browser verification suite. Waiting for the verification to finish...
 
 ---
 
