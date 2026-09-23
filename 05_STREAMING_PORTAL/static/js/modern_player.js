@@ -967,13 +967,9 @@ function showHttpHelper(channel) {
   const descEl = document.getElementById('helperDesc');
 
   if (ch) {
-    if (titleEl) titleEl.innerText = `${ch.name} - Play in VLC or Cast to TV`;
+    if (titleEl) titleEl.innerText = `${ch.name} - Offline`;
     if (descEl) {
-      if (ch.url && ch.url.startsWith('http://')) {
-        descEl.innerText = `This stream uses unencrypted HTTP. Modern browsers restrict HTTP inside HTTPS web apps. Click "Play in VLC" to watch immediately, or Cast directly to your TV screen!`;
-      } else {
-        descEl.innerText = `This stream uses origin token security that web browsers restrict. VLC Media Player plays it smoothly! Click "Play in VLC (1-Click)" or Cast to TV.`;
-      }
+      descEl.innerText = `This stream is currently offline or unreachable. Please select another channel from the playlist.`;
     }
   }
   overlay.classList.remove('hidden');
