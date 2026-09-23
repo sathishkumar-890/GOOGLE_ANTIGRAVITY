@@ -106,23 +106,77 @@ def api_channels(request):
     })
 
 def proxy_stream(request):
-    target_url = request.GET.get('url', 'https://cloudplay-sonyliv.pages.dev/pixhd.m3u8')
+    target_url = request.GET.get('url', 'https://cloudplay-sonyliv.pages.dev/ten4.m3u8')
     if not target_url or not target_url.startswith(('http://', 'https://')):
         return JsonResponse({"status": "error", "message": "Invalid URL"}, status=400)
     try:
         req = urllib.request.Request(
             target_url,
             headers={
-                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+                "Accept": "*/*"
             }
         )
-        with urllib.request.urlopen(req, timeout=8) as resp:
+        range_header = request.headers.get("Range")
+        if range_header:
+            req.add_header("Range", range_header)
+
+        with urllib.request.urlopen(req, timeout=12) as resp:
             content = resp.read()
-            content_type = resp.headers.get("Content-Type", "application/vnd.apple.mpegurl")
+            content_type = resp.headers.get("Content-Type", "application/octet-stream")
+            
+            # Check if this is an M3U8 manifest
+            is_m3u8 = (
+                "mpegurl" in content_type.lower()
+                or target_url.lower().endswith(".m3u8")
+                or ".m3u8?" in target_url.lower()
+                or content.startswith(b"#EXTM3U")
+            )
+
+            if is_m3u8:
+                import urllib.parse
+                manifest_text = content.decode("utf-8", errors="replace")
+                base_url = target_url.rsplit("/", 1)[0] + "/"
+                proxy_base = request.build_absolute_uri(reverse('welcomeapp:proxy_stream')) + "?url="
+
+                rewritten_lines = []
+                for line in manifest_text.splitlines():
+                    trimmed = line.strip()
+                    if not trimmed:
+                        rewritten_lines.append(line)
+                        continue
+
+                    # Rewrite AES-128 key URI
+                    if trimmed.startswith("#EXT-X-KEY"):
+                        def key_replacer(match):
+                            key_uri = match.group(1)
+                            if not key_uri.startswith(("http://", "https://")):
+                                key_uri = urllib.parse.urljoin(base_url, key_uri)
+                            return f'URI="{proxy_base}{urllib.parse.quote(key_uri)}"'
+
+                        trimmed = re.sub(r'URI="([^"]+)"', key_replacer, trimmed)
+                        rewritten_lines.append(trimmed)
+                        continue
+
+                    if trimmed.startswith("#"):
+                        rewritten_lines.append(trimmed)
+                        continue
+
+                    # Rewrite child variant playlist or TS segment URI
+                    full_segment_url = trimmed
+                    if not full_segment_url.startswith(("http://", "https://")):
+                        full_segment_url = urllib.parse.urljoin(base_url, full_segment_url)
+
+                    rewritten_lines.append(f"{proxy_base}{urllib.parse.quote(full_segment_url)}")
+
+                content = "\n".join(rewritten_lines).encode("utf-8")
+                content_type = "application/vnd.apple.mpegurl"
+
             response = HttpResponse(content, content_type=content_type)
             response["Access-Control-Allow-Origin"] = "*"
             response["Access-Control-Allow-Headers"] = "*"
             response["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            response["Access-Control-Expose-Headers"] = "*"
             return response
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=502)
