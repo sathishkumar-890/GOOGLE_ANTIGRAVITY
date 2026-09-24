@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: hls-streaming-proxy
+    runtime: python
+    plan: free
+    buildCommand: ""
+    startCommand: "python 05_STREAMING_PORTAL/multi_stream_proxy.py --host 0.0.0.0"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9

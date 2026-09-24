@@ -649,9 +649,10 @@ class SilentThreadingHTTPServer(ThreadingHTTPServer):
         super().handle_error(request, client_address)
 
 def main():
+    default_port = int(os.environ.get("PORT", 8888))
     parser = argparse.ArgumentParser(description="Unified Multi-Stream HLS Rewriting & CORS Proxy")
     parser.add_argument("--host", default="0.0.0.0", help="Host interface to bind (default: 0.0.0.0)")
-    parser.add_argument("--port", type=int, default=8888, help="Port to listen on (default: 8888)")
+    parser.add_argument("--port", type=int, default=default_port, help="Port to listen on (default: 8888 or $PORT)")
     args = parser.parse_args()
 
     server = SilentThreadingHTTPServer((args.host, args.port), MultiStreamProxyHandler)

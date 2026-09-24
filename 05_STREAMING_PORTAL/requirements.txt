@@ -1,0 +1,2 @@
+# Pure standard library - no external packages required
+# Python 3.8+
