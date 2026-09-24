@@ -24,11 +24,20 @@ import urllib.error
 import ssl
 from http.server import ThreadingHTTPServer, BaseHTTPRequestHandler
 
-# Ensure UTF-8 output on Windows consoles
-if hasattr(sys.stdout, "reconfigure"):
-    sys.stdout.reconfigure(encoding="utf-8")
-if hasattr(sys.stderr, "reconfigure"):
-    sys.stderr.reconfigure(encoding="utf-8")
+# Handle pythonw.exe where sys.stdout and sys.stderr are None
+if sys.stdout is None:
+    log_dir = os.path.dirname(os.path.abspath(__file__))
+    try:
+        log_file = open(os.path.join(log_dir, "proxy.log"), "a", encoding="utf-8", buffering=1)
+        sys.stdout = log_file
+        sys.stderr = log_file
+    except Exception:
+        pass
+else:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
 
 # Permissive SSL Context for CDNs with custom TLS handshakes
 SSL_CONTEXT = ssl.create_default_context()
@@ -90,9 +99,13 @@ class MultiStreamProxyHandler(BaseHTTPRequestHandler):
     protocol_version = "HTTP/1.1"
 
     def log_message(self, format, *args):
-        # Clean timestamped console log
-        sys.stdout.write(f"[STREAM-PROXY] {self.client_address[0]} - {format % args}\n")
-        sys.stdout.flush()
+        # Clean timestamped console / file log
+        if sys.stdout:
+            try:
+                sys.stdout.write(f"[STREAM-PROXY] {self.client_address[0]} - {format % args}\n")
+                sys.stdout.flush()
+            except Exception:
+                pass
 
     def send_cors_headers(self):
         self.send_header("Access-Control-Allow-Origin", "*")
